@@ -1,0 +1,119 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String          @id @default(uuid())
+  email         String          @unique
+  passwordHash  String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  gitHubAccount GitHubAccount?
+  auditLogs     AuditLog[]
+}
+
+model GitHubAccount {
+  id           String    @id // GitHub User ID
+  userId       String    @unique
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  username     String
+  accessToken  String
+  refreshToken String?
+  expiresAt    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Organization {
+  id           String       @id // GitHub Organization ID
+  name         String
+  avatarUrl    String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  repositories Repository[]
+}
+
+model Repository {
+  id             String             @id // GitHub Repository ID
+  organizationId String
+  organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
+  fullName       String
+  private        Boolean
+  htmlUrl        String
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  jobs           DocumentationJob[]
+}
+
+model GitHubInstallation {
+  id                  String   @id // GitHub App Installation ID
+  targetType          String   // "Organization" or "User"
+  targetId            String   // Target Account ID
+  repositorySelection String   // "all" or "selected"
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+enum JobStatus {
+  QUEUED
+  PROCESSING
+  SUCCEEDED
+  FAILED
+}
+
+model DocumentationJob {
+  id           String                 @id @default(uuid())
+  repositoryId String
+  repository   Repository             @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  commitSha    String
+  eventId      String
+  status       JobStatus              @default(QUEUED)
+  attempts     Int                    @default(0)
+  maxAttempts  Int                    @default(3)
+  errorReason  String?
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+  versions     DocumentationVersion[]
+  pullRequests PullRequest[]
+
+  @@unique([repositoryId, commitSha, eventId])
+}
+
+model DocumentationVersion {
+  id           String           @id @default(uuid())
+  repositoryId String
+  commitSha    String
+  filePath     String
+  content      String
+  jobId        String
+  job          DocumentationJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  createdAt    DateTime         @default(now())
+}
+
+model PullRequest {
+  id                String           @id @default(uuid())
+  repositoryId      String
+  jobId             String
+  job               DocumentationJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  pullRequestNumber Int
+  htmlUrl           String
+  branchName        String
+  status            String           // "OPEN", "MERGED", "CLOSED"
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String   // "LOGIN", "CONNECT_REPO", "GENERATE_DOCS", "CREATE_PR", "FAILURE"
+  details   String?  // JSON context metadata
+  createdAt DateTime @default(now())
+}
