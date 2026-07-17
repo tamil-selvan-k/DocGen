@@ -25,7 +25,6 @@ export default function GitHubCallback() {
         error(`GitHub connection failed: ${errorParam.replace(/_/g, ' ')}`);
         setTimeout(() => navigate('/app/settings'), 2000);
       } else {
-        // No params — might be a stale load
         navigate('/app/settings');
       }
     };
