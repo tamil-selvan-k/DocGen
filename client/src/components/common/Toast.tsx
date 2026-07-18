@@ -43,7 +43,6 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         <AnimatePresence>
           {toasts.map(t => {
             const Icon = icons[t.type];
-            console.log(t);
             return (
               <motion.div key={t.id}
                 initial={{ opacity: 0, x: 60 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 60 }}
