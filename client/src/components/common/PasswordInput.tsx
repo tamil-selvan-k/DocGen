@@ -9,7 +9,7 @@ interface PasswordInputProps extends React.InputHTMLAttributes<HTMLInputElement>
 export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
   ({ label, error, className = '', id, ...props }, ref) => {
     const [show, setShow] = useState(false);
-    const inputId = id || 'password';
+    const inputId = id || `password-${label?.toLowerCase().replace(/\s+/g, '-') ?? 'field'}`;
     return (
       <div className="flex flex-col gap-1.5">
         {label && (

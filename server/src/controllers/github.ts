@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { Request, Response } from 'express';
 import { config } from '../config/env';
 import { ApiError } from '../utils/ApiError';
@@ -13,11 +14,15 @@ import { logger } from '../utils/logger';
 export const connect = asyncHandler(async (req: Request, res: Response) => {
   if (!req.user) throw new ApiError('Unauthorized', 401);
 
+  // state = csrf_token:userId — random token prevents CSRF / account-linking attacks
+  const csrfToken = crypto.randomBytes(16).toString('hex');
+  const state = `${csrfToken}:${req.user.id}`;
+
   const params = new URLSearchParams({
     client_id: config.GITHUB_CLIENT_ID,
-    redirect_uri: `${config.CLIENT_URL.replace(':5173', ':5000')}/api/v1/github/callback`,
+    redirect_uri: `${config.SERVER_URL}/api/v1/github/callback`,
     scope: 'read:user user:email repo',
-    state: req.user.id,
+    state,
   });
 
   res.redirect(`https://github.com/login/oauth/authorize?${params.toString()}`);
@@ -28,11 +33,18 @@ export const connect = asyncHandler(async (req: Request, res: Response) => {
  * Exchanges OAuth code for access token, links GitHub account, redirects to frontend.
  */
 export const callback = asyncHandler(async (req: Request, res: Response) => {
-  const { code, state: userId } = req.query as { code: string; state: string };
+  const { code, state } = req.query as { code: string; state: string };
 
-  if (!code || !userId) {
+  if (!code || !state) {
     return res.redirect(`${config.CLIENT_URL}/github/callback?error=missing_params`);
   }
+
+  // state format: csrfToken:userId
+  const colonIdx = state.indexOf(':');
+  if (colonIdx === -1) {
+    return res.redirect(`${config.CLIENT_URL}/github/callback?error=invalid_state`);
+  }
+  const userId = state.slice(colonIdx + 1);
 
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) {
@@ -56,6 +68,8 @@ export const callback = asyncHandler(async (req: Request, res: Response) => {
 
   const tokenData = (await tokenResponse.json()) as {
     access_token?: string;
+    refresh_token?: string;
+    expires_in?: number;
     error?: string;
     error_description?: string;
   };
@@ -70,7 +84,7 @@ export const callback = asyncHandler(async (req: Request, res: Response) => {
     headers: {
       Authorization: `Bearer ${tokenData.access_token}`,
       Accept: 'application/vnd.github+json',
-      'User-Agent': 'AutoDocs-AI',
+      'User-Agent': 'DocGen-AI',
     },
   });
 
@@ -80,6 +94,10 @@ export const callback = asyncHandler(async (req: Request, res: Response) => {
 
   const ghUser = (await ghUserResponse.json()) as { id: number; login: string };
 
+  const expiresAt = tokenData.expires_in
+    ? new Date(Date.now() + tokenData.expires_in * 1000)
+    : null;
+
   await prisma.gitHubAccount.upsert({
     where: { id: String(ghUser.id) },
     create: {
@@ -87,11 +105,15 @@ export const callback = asyncHandler(async (req: Request, res: Response) => {
       userId: user.id,
       username: ghUser.login,
       accessToken: tokenData.access_token,
+      refreshToken: tokenData.refresh_token ?? null,
+      expiresAt,
     },
     update: {
       userId: user.id,
       username: ghUser.login,
       accessToken: tokenData.access_token,
+      refreshToken: tokenData.refresh_token ?? null,
+      expiresAt,
     },
   });
 

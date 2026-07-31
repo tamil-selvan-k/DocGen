@@ -18,7 +18,7 @@ async function bootstrap() {
 
     // 3. Start the HTTP server
     server = app.listen(config.PORT, () => {
-      logger.info(`✅ AutoDocs AI server running on port ${config.PORT} [${config.NODE_ENV}]`);
+      logger.info(`✅ DocGen AI server running on port ${config.PORT} [${config.NODE_ENV}]`);
       logger.info(`📖 API available at http://localhost:${config.PORT}/api/v1`);
       logger.info(`🔍 Health check at http://localhost:${config.PORT}/api/v1/health`);
     });
@@ -37,9 +37,12 @@ async function bootstrap() {
 async function shutdown(signal: string) {
   logger.info(`🛑 Shutdown signal received: ${signal}. Commencing graceful shutdown...`);
 
-  // Stop accepting new HTTP connections
+  // Stop accepting new HTTP connections and wait for in-flight requests to drain
   if (server) {
-    server.close(() => logger.info('HTTP server closed'));
+    await new Promise<void>(resolve => server.close(() => {
+      logger.info('HTTP server closed');
+      resolve();
+    }));
   }
 
   // Drain the BullMQ worker gracefully

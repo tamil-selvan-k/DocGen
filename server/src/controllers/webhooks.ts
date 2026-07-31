@@ -54,7 +54,12 @@ export const receiveWebhook = asyncHandler(async (req: Request, res: Response) =
   const commitSha: string = payload.after;
   const eventId: string = deliveryId || `${repo.id}-${commitSha}`;
   const repositoryId: string = String(repo.id);
-  const installationId: string = String(payload.installation?.id);
+
+  if (!payload.installation?.id) {
+    logger.warn(`Webhook push event missing installation id for delivery ${deliveryId} — skipping`);
+    return res.status(200).json({ success: true, data: null, error: null, meta: { message: 'No installation — event skipped' } });
+  }
+  const installationId: string = String(payload.installation.id);
 
   // 4. Upsert repository reference
   let organization = await prisma.organization.findUnique({ where: { id: String(repo.owner.id) } });
@@ -126,8 +131,8 @@ export const receiveWebhook = asyncHandler(async (req: Request, res: Response) =
  * Handles GitHub App installation events by upserting GitHubInstallation records.
  */
 async function handleInstallationEvent(payload: any, eventType: string): Promise<void> {
-  const installationId = String(payload.installation?.id);
-  if (!installationId) return;
+  if (!payload.installation?.id) return;
+  const installationId = String(payload.installation.id);
 
   const action = payload.action;
   logger.info(`GitHub App installation event: ${eventType} action=${action} installation=${installationId}`);

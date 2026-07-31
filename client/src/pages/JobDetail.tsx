@@ -19,7 +19,7 @@ function VersionModal({ jobId, version, open, onClose }: {
   open: boolean;
   onClose: () => void;
 }) {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['version', version?.id],
     queryFn: () => jobsApi.getVersionContent(jobId, version!.id),
     select: r => r.data.data,
@@ -30,6 +30,10 @@ function VersionModal({ jobId, version, open, onClose }: {
     <Modal open={open} onClose={onClose} title={version?.filePath} maxWidth="max-w-4xl">
       {isLoading ? (
         <div className="flex justify-center py-8"><Spinner /></div>
+      ) : isError ? (
+        <div className="flex items-center gap-2 text-sm text-red-400 py-8 justify-center">
+          <AlertTriangle className="w-4 h-4" />Failed to load documentation content
+        </div>
       ) : (
         <div className="prose prose-invert prose-sm max-w-none max-h-[70vh] overflow-auto bg-[#0d1017] rounded-lg p-4">
           <ReactMarkdown>{data?.content ?? ''}</ReactMarkdown>
@@ -43,7 +47,7 @@ export default function JobDetail() {
   const { id } = useParams<{ id: string }>();
   const [selectedVersion, setSelectedVersion] = useState<DocumentationVersion | null>(null);
 
-  const { data: job, isLoading } = useQuery({
+  const { data: job, isLoading, isError } = useQuery({
     queryKey: ['job', id],
     queryFn: () => jobsApi.get(id!),
     select: r => r.data.data,
@@ -58,6 +62,14 @@ export default function JobDetail() {
       </div>
     );
   }
+
+  if (isError) return (
+    <div className="text-center py-16">
+      <AlertTriangle className="w-12 h-12 text-red-400 mx-auto mb-3" />
+      <p className="text-slate-300 font-medium">Failed to load job</p>
+      <Link to="/app/jobs" className="text-indigo-400 text-sm hover:text-indigo-300 mt-2 inline-block">← Back to jobs</Link>
+    </div>
+  );
 
   if (!job) return (
     <div className="text-center py-16">

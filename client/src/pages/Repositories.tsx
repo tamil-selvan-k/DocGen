@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { GitBranch, RefreshCw, ExternalLink, Search } from 'lucide-react';
+import { GitBranch, RefreshCw, ExternalLink, Search, AlertTriangle } from 'lucide-react';
 import { repositoriesApi } from '@/api/repositories.api';
 import { Card } from '@/components/common/Card';
 import { Badge } from '@/components/common/Badge';
@@ -18,13 +18,14 @@ function SyncModal({ repo, open, onClose }: { repo: Repository | null; open: boo
   const qc = useQueryClient();
   const { success, error } = useToast();
 
+  const handleClose = () => { setCommitSha(''); onClose(); };
+
   const mutation = useMutation({
     mutationFn: () => repositoriesApi.sync(repo!.id, commitSha ? { commitSha } : {}),
     onSuccess: (res) => {
       success(`Job queued: ${res.data.data.jobId}`);
       qc.invalidateQueries({ queryKey: ['jobs'] });
-      onClose();
-      setCommitSha('');
+      handleClose();
     },
     onError: (err: unknown) => {
       const e = err as { message?: string };
@@ -33,7 +34,7 @@ function SyncModal({ repo, open, onClose }: { repo: Repository | null; open: boo
   });
 
   return (
-    <Modal open={open} onClose={onClose} title={`Sync ${repo?.fullName}`}>
+    <Modal open={open} onClose={handleClose} title={`Sync ${repo?.fullName}`}>
       <div className="space-y-4">
         <p className="text-sm text-slate-400">
           Trigger documentation generation. Leave commit SHA blank to use the latest commit.
@@ -46,7 +47,7 @@ function SyncModal({ repo, open, onClose }: { repo: Repository | null; open: boo
           hint="Leave empty to auto-resolve the latest commit"
         />
         <div className="flex gap-3 justify-end pt-1">
-          <Button variant="secondary" onClick={onClose}>Cancel</Button>
+          <Button variant="secondary" onClick={handleClose}>Cancel</Button>
           <Button loading={mutation.isPending} onClick={() => mutation.mutate()}>
             <RefreshCw className="w-4 h-4" /> Sync Now
           </Button>
@@ -60,7 +61,7 @@ export default function Repositories() {
   const [search, setSearch] = useState('');
   const [syncTarget, setSyncTarget] = useState<Repository | null>(null);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['repositories'],
     queryFn: () => repositoriesApi.list(),
     select: r => r.data.data,
@@ -95,6 +96,8 @@ export default function Repositories() {
 
       {isLoading ? (
         <div className="grid gap-4">{[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}</div>
+      ) : isError ? (
+        <div className="flex items-center gap-2 text-sm text-red-400 py-8 justify-center"><AlertTriangle className="w-4 h-4" />Failed to load repositories. Please try again.</div>
       ) : !filtered.length ? (
         <EmptyState icon={GitBranch} title="No repositories found" description="Connect your GitHub account in Settings to see your repositories" />
       ) : (

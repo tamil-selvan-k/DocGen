@@ -76,7 +76,4 @@ client.interceptors.response.use(
   }
 );
 
-// Retry GET requests on network error (up to 2 times)
-client.interceptors.request.use((config: InternalAxiosRequestConfig) => config);
-
 export default client;

@@ -4,6 +4,8 @@ import { ApiResponse } from '../utils/ApiResponse';
 import asyncHandler from '../utils/asyncHandler';
 import prisma from '../utils/prisma';
 
+const VALID_STATUSES = new Set(['QUEUED', 'PROCESSING', 'SUCCEEDED', 'FAILED']);
+
 /**
  * GET /api/v1/jobs
  * Returns paginated documentation jobs, optionally filtered by repositoryId or status.
@@ -22,6 +24,10 @@ export const listJobs = asyncHandler(async (req: Request, res: Response) => {
   const pageNum = Math.max(1, parseInt(String(req.query.page || '1'), 10));
   const limitNum = Math.min(100, Math.max(1, parseInt(String(req.query.limit || '20'), 10)));
   const skip = (pageNum - 1) * limitNum;
+
+  if (status && !VALID_STATUSES.has(status)) {
+    throw new ApiError(`Invalid status value. Must be one of: ${[...VALID_STATUSES].join(', ')}`, 400);
+  }
 
   const where: Record<string, unknown> = {};
   if (repositoryId) where.repositoryId = repositoryId;

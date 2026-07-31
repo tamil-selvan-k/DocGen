@@ -1,302 +1,160 @@
-# 🚀 DocGen
+# DocGen AI
 
-> **Automatically generate and maintain project documentation from your codebase.**
+Automated documentation management powered by Google Gemini. When code is pushed to a GitHub repository with the GitHub App installed, DocGen AI fetches the commit diff, generates updated documentation, validates it against the actual code to prevent hallucinations, and opens a pull request — all automatically.
 
-DocGen is an AI-powered documentation automation platform that keeps your project documentation synchronized with your source code. By integrating with GitHub, DocGen analyzes code changes whenever a pull request is merged or new commits are pushed, generates accurate documentation using Google's Gemini models, validates the generated content, and creates pull requests containing the documentation updates for developer review.
+## How it works
 
-> **Write code. DocGen writes the documentation.**
+1. Developer pushes code to a GitHub repository
+2. GitHub App sends a webhook to DocGen AI
+3. A BullMQ worker fetches the diff, calls Gemini to generate docs, then validates the output
+4. If validation passes, a branch is created and a PR is opened with the updated `README.md` or `docs/API.md`
+5. The developer reviews and merges the PR
 
----
+Documentation can also be triggered manually from the web dashboard.
 
-## ✨ Features
+## Tech stack
 
-- 🤖 AI-powered documentation generation using Google Gemini
-- 📖 Automatic README updates
-- 🔌 API documentation generation
-- 📝 Intelligent changelog generation
-- 🔄 Documentation versioning
-- 🌿 Automatic documentation Pull Requests
-- 📊 Documentation generation history
-- ⚡ Background job processing with BullMQ
-- 🔒 Secure GitHub OAuth & GitHub App integration
-- 🏢 Multi-repository support
-- 📈 Job monitoring dashboard
-- 🛡️ Documentation validation before PR creation
+| Layer | Technology |
+|---|---|
+| Frontend | React 19, TypeScript, Vite, TailwindCSS v4 |
+| Backend | Node.js, Express 5, TypeScript |
+| Database | PostgreSQL via Prisma v6 |
+| Queue | BullMQ backed by Redis |
+| AI | Google Gemini API |
+| Auth | JWT (HTTP-only cookies) |
+| GitHub | OAuth App + GitHub App (webhooks, installation tokens) |
 
----
+## Prerequisites
 
-## 🏗️ Architecture
+- Node.js 20+
+- pnpm
+- PostgreSQL (default port 5422 in dev)
+- Redis (default port 6379)
+- A GitHub OAuth App
+- A GitHub App with webhook configured
+- A Google Gemini API key
 
-```text
-                   GitHub
-                      │
-       Push / Merge / Webhook Events
-                      │
-                      ▼
-               GitHub Webhook
-                      │
-                      ▼
-             Express Backend API
-                      │
-         ┌────────────┴────────────┐
-         │                         │
-         ▼                         ▼
- Authentication              BullMQ Queue
-         │                         │
-         ▼                         ▼
- PostgreSQL                Worker Processor
-                                   │
-                     ┌─────────────┴─────────────┐
-                     ▼                           ▼
-            Repository Analyzer          GitHub Services
-                     │                           │
-                     ▼                           ▼
-             Gemini Documentation Engine
-                     │
-                     ▼
-          Documentation Validator
-                     │
-                     ▼
-            Create Documentation PR
-                     │
-                     ▼
-                  GitHub
-```
+## Setup
 
----
-
-## 🛠 Tech Stack
-
-### Frontend
-
-- React
-- TypeScript
-- React Router
-- Tailwind CSS
-- Axios
-- TanStack Query
-- React Hook Form
-- Zod
-
-### Backend
-
-- Node.js
-- Express.js
-- TypeScript
-- Prisma ORM
-- BullMQ
-- Redis
-
-### Database
-
-- PostgreSQL
-
-### AI
-
-- Google Gemini API
-
-### Authentication
-
-- Email & Password
-- GitHub OAuth
-- GitHub App
-
-### DevOps
-
-- Docker
-- GitHub Webhooks
-
----
-
-## 📁 Project Structure
-
-```text
-DocGen/
-│
-├── client/
-│   ├── src/
-│   ├── public/
-│   └── ...
-│
-├── server/
-│   ├── prisma/
-│   ├── src/
-│   │   ├── config/
-│   │   ├── controllers/
-│   │   ├── middleware/
-│   │   ├── queue/
-│   │   ├── repositories/
-│   │   ├── routes/
-│   │   ├── services/
-│   │   ├── utils/
-│   │   ├── validators/
-│   │   └── workers/
-│   └── ...
-│
-└── README.md
-```
-
----
-
-## 🚀 Workflow
-
-1. User signs in using Email or GitHub.
-2. User installs the DocGen GitHub App.
-3. GitHub sends webhook events to DocGen.
-4. DocGen queues documentation generation jobs.
-5. Repository changes are analyzed.
-6. Gemini generates updated documentation.
-7. Generated content is validated.
-8. A new branch is created.
-9. Documentation changes are committed.
-10. A Pull Request is opened for review.
-
----
-
-## 🔐 Authentication
-
-DocGen supports:
-
-- Email & Password
-- GitHub OAuth
-- GitHub App Installation
-
-Authentication is secured using JWT and role-based authorization.
-
----
-
-## 📚 Generated Documentation
-
-DocGen can automatically generate:
-
-- README updates
-- API documentation
-- Changelog
-- Release notes
-- Architecture summaries
-- Migration guides
-- Pull Request summaries
-
----
-
-## ⚙️ Environment Variables
-
-### Backend
-
-```env
-DATABASE_URL=
-
-REDIS_URL=
-
-JWT_SECRET=
-
-GEMINI_API_KEY=
-
-GITHUB_APP_ID=
-
-GITHUB_CLIENT_ID=
-
-GITHUB_CLIENT_SECRET=
-
-GITHUB_PRIVATE_KEY=
-
-GITHUB_WEBHOOK_SECRET=
-
-CLIENT_URL=
-```
-
----
-
-## 📦 Installation
-
-### Clone
+### 1. Clone and install
 
 ```bash
-git clone https://github.com/<your-username>/DocGen.git
+git clone <repo-url>
+cd Automated_Docs_Management
+
+# Install server dependencies
+cd server && pnpm install
+
+# Install client dependencies
+cd ../client && pnpm install
 ```
 
-### Backend
+### 2. Configure environment
+
+```bash
+cp server/.env.example server/.env
+```
+
+Edit `server/.env` and fill in all required values (see `.env.example` for the full list).
+
+Required variables:
+- `DATABASE_URL` — PostgreSQL connection string
+- `REDIS_URL` — Redis connection string
+- `JWT_SECRET` — min 8 chars
+- `JWT_REFRESH_SECRET` — min 8 chars
+- `SERVER_URL` — public URL of the backend (e.g. `http://localhost:5000`)
+- `CLIENT_URL` — public URL of the frontend (e.g. `http://localhost:5173`)
+- `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` — GitHub OAuth App credentials
+- `GITHUB_APP_ID` / `GITHUB_PRIVATE_KEY` — GitHub App credentials (key is Base64-encoded PEM)
+- `GITHUB_WEBHOOK_SECRET` — HMAC secret set in your GitHub App webhook settings
+- `GEMINI_API_KEY` — Google AI Studio API key
+
+### 3. Set up the database
 
 ```bash
 cd server
-npm install
+pnpm exec prisma db push
 ```
 
-### Frontend
+### 4. GitHub App setup
+
+1. Create a GitHub App at `github.com/settings/apps`
+2. Set the webhook URL to `https://<your-server>/api/v1/webhooks/github`
+3. Subscribe to **Push** and **Installation** events
+4. Generate a private key, Base64-encode it: `base64 -w 0 private-key.pem`
+5. Set `GITHUB_APP_ID`, `GITHUB_PRIVATE_KEY`, and `GITHUB_WEBHOOK_SECRET` in `.env`
+
+### 5. Run in development
 
 ```bash
-cd client
-npm install
+# Terminal 1 — backend
+cd server && pnpm dev
+
+# Terminal 2 — frontend
+cd client && pnpm dev
 ```
 
-### Prisma
+The API runs on `http://localhost:5000` and the frontend on `http://localhost:5173`.
+
+## Production build
 
 ```bash
-npx prisma migrate dev
+# Build frontend
+cd client && pnpm build
+
+# Compile server
+cd server && npx tsc
+
+# Start server
+cd server && pnpm start
 ```
 
-### Start Redis
+## Running tests
 
 ```bash
-docker compose up redis
+cd server
+node --import tsx/esm src/tests/foundation.test.ts
 ```
 
-### Start Backend
+## API overview
 
-```bash
-npm run dev
+All routes are prefixed with `/api/v1`.
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| POST | `/auth/signup` | No | Register |
+| POST | `/auth/login` | No | Login |
+| POST | `/auth/logout` | No | Logout |
+| GET | `/auth/me` | Cookie | Current user |
+| GET | `/github/connect` | Yes | Start GitHub OAuth |
+| GET | `/github/callback` | No | OAuth callback |
+| POST | `/webhooks/github` | No (HMAC) | Receive GitHub webhooks |
+| GET | `/repositories` | Yes | List GitHub repositories |
+| POST | `/repositories/:id/sync` | Yes | Trigger manual doc sync |
+| GET | `/jobs` | Yes | List documentation jobs |
+| GET | `/jobs/:id` | Yes | Job details |
+| GET | `/jobs/:jobId/versions/:versionId` | Yes | Full doc version content |
+| GET | `/health` | No | Health check |
+
+## Project structure
+
 ```
-
-### Start Frontend
-
-```bash
-npm run dev
+├── client/                  # React frontend (separate pnpm project)
+│   └── src/
+│       ├── api/             # Axios API layer
+│       ├── components/      # Shared UI components
+│       ├── contexts/        # AuthContext
+│       ├── pages/           # Route-level page components
+│       └── types/           # TypeScript types
+│
+└── server/                  # Express backend (separate pnpm project)
+    ├── prisma/
+    │   └── schema.prisma
+    └── src/
+        ├── config/          # Zod-validated env config
+        ├── controllers/     # Route handlers
+        ├── middleware/      # Auth, error handling
+        ├── queue/           # BullMQ worker pipeline
+        ├── routes/          # Express router
+        └── utils/           # GitHub client, Gemini client, helpers
 ```
-
----
-
-## 📈 Roadmap
-
-- [x] GitHub OAuth
-- [x] GitHub App Integration
-- [x] Documentation Generation Pipeline
-- [x] BullMQ Job Queue
-- [x] Repository Synchronization
-- [ ] Multi-language Repository Analysis
-- [ ] Slack Integration
-- [ ] Jira Integration
-- [ ] Teams & Organizations
-- [ ] AI Documentation Chat
-- [ ] VS Code Extension
-- [ ] GitLab Support
-- [ ] Bitbucket Support
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome!
-
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push the branch
-5. Open a Pull Request
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
----
-
-## ⭐ Support
-
-If you find DocGen useful, consider giving the repository a ⭐ to support the project.
-
----
-
-<p align="center">
-Built with ❤️ using Node.js, React, PostgreSQL, BullMQ and Google Gemini
-</p>

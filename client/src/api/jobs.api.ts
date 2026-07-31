@@ -5,7 +5,7 @@ import type { JobListItem, JobDetail, JobsListParams, DocumentationVersionFull }
 
 export const jobsApi = {
   list: (params: JobsListParams = {}) =>
-    client.get<ApiResponse<JobListItem[]> & { meta: PaginatedMeta }>(ENDPOINTS.JOBS, { params }),
+    client.get<ApiResponse<JobListItem[]>>(ENDPOINTS.JOBS, { params }),
 
   get: (id: string) =>
     client.get<ApiResponse<JobDetail>>(ENDPOINTS.JOB(id)),

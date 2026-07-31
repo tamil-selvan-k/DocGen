@@ -17,7 +17,7 @@ process.env.GITHUB_PRIVATE_KEY = Buffer.from('-----BEGIN RSA PRIVATE KEY-----\nd
 process.env.GITHUB_WEBHOOK_SECRET = 'dummy-webhook-secret';
 process.env.GEMINI_API_KEY = 'dummy-gemini-key';
 
-describe('AutoDocs AI - Foundation Unit Tests', () => {
+describe('DocGen AI - Foundation Unit Tests', () => {
   let config: any;
   let getGitHubPrivateKey: any;
   let GitHubClient: any;

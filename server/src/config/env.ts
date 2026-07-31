@@ -11,7 +11,8 @@ const envSchema = z.object({
   DATABASE_URL: z.string().url("DATABASE_URL must be a valid URL"),
   REDIS_URL: z.string().url("REDIS_URL must be a valid URL"),
   JWT_SECRET: z.string().min(8, "JWT_SECRET must be at least 8 characters long"),
-  JWT_REFRESH_SECRET: z.string().min(8).default('refresh-secret-change-me-in-prod'),
+  JWT_REFRESH_SECRET: z.string().min(8, "JWT_REFRESH_SECRET must be at least 8 characters long"),
+  SERVER_URL: z.string().url().default('http://localhost:5000'),
   GITHUB_CLIENT_ID: z.string().min(1, "GITHUB_CLIENT_ID is required"),
   GITHUB_CLIENT_SECRET: z.string().min(1, "GITHUB_CLIENT_SECRET is required"),
   GITHUB_APP_ID: z.string().min(1, "GITHUB_APP_ID is required"),
@@ -24,7 +25,7 @@ const envSchema = z.object({
   SMTP_PORT: z.coerce.number().optional(),
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
-  SMTP_FROM: z.string().default('noreply@autodocs.ai'),
+  SMTP_FROM: z.string().default('noreply@docgen.ai'),
 });
 
 const parseEnv = () => {
@@ -46,14 +47,13 @@ export const config = parseEnv();
  * The environment variable is expected to be a Base64-encoded PEM private key.
  */
 export const getGitHubPrivateKey = (): string => {
-  try {
-    const decoded = Buffer.from(config.GITHUB_PRIVATE_KEY, 'base64').toString('utf8');
-    if (!decoded.includes('-----BEGIN PRIVATE KEY-----') && !decoded.includes('-----BEGIN RSA PRIVATE KEY-----')) {
-      throw new Error("Decoded string does not contain a valid private key header.");
-    }
+  const decoded = Buffer.from(config.GITHUB_PRIVATE_KEY, 'base64').toString('utf8');
+  if (decoded.includes('-----BEGIN PRIVATE KEY-----') || decoded.includes('-----BEGIN RSA PRIVATE KEY-----')) {
     return decoded;
-  } catch (error) {
-    // Fallback to raw if decoding fails or doesn't have PEM header
+  }
+  // Not valid Base64-encoded PEM — use the raw value (already a PEM string)
+  if (config.GITHUB_PRIVATE_KEY.includes('-----BEGIN')) {
     return config.GITHUB_PRIVATE_KEY;
   }
+  throw new Error('GITHUB_PRIVATE_KEY is not a valid PEM key or Base64-encoded PEM key');
 };

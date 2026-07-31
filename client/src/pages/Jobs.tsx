@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Briefcase, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Briefcase, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { jobsApi } from '@/api/jobs.api';
 import { Card } from '@/components/common/Card';
@@ -23,7 +23,7 @@ export default function Jobs() {
   const [status, setStatus] = useState<JobStatus | ''>('');
   const [page, setPage] = useState(1);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['jobs', { status, page }],
     queryFn: () => jobsApi.list({ status: status || undefined, page, limit: 20 }),
     select: r => r.data,
@@ -62,46 +62,49 @@ export default function Jobs() {
 
       {isLoading ? (
         <div className="space-y-3">{[...Array(5)].map((_, i) => <SkeletonCard key={i} />)}</div>
+      ) : isError ? (
+        <div className="flex items-center gap-2 text-sm text-red-400 py-8 justify-center"><AlertTriangle className="w-4 h-4" />Failed to load jobs. Please try again.</div>
       ) : !jobs.length ? (
         <EmptyState icon={Briefcase} title="No jobs found" description="Jobs appear after webhook push events or manual syncs" />
       ) : (
         <>
           <div className="space-y-2">
             {jobs.map(job => (
-              <Link key={job.id} to={`/app/jobs/${job.id}`}>
-                <Card className="hover:border-indigo-600/30 transition-colors cursor-pointer">
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className="font-medium text-slate-200">{job.repository?.fullName}</p>
-                        <Badge variant={job.status as JobStatus} dot>{job.status}</Badge>
-                      </div>
-                      <div className="flex items-center gap-3 mt-1">
-                        <span className="text-xs font-mono text-slate-500">
-                          {shortSha(job.commitSha)}
-                        </span>
-                        <span className="text-xs text-slate-600">{formatRelative(job.createdAt)}</span>
-                        {job.attempts > 0 && (
-                          <span className="text-xs text-slate-600">Attempt {job.attempts}</span>
+              <div key={job.id} className="flex items-center gap-2">
+                <Link to={`/app/jobs/${job.id}`} className="flex-1 min-w-0">
+                  <Card className="hover:border-indigo-600/30 transition-colors cursor-pointer">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-medium text-slate-200">{job.repository?.fullName}</p>
+                          <Badge variant={job.status as JobStatus} dot>{job.status}</Badge>
+                        </div>
+                        <div className="flex items-center gap-3 mt-1">
+                          <span className="text-xs font-mono text-slate-500">
+                            {shortSha(job.commitSha)}
+                          </span>
+                          <span className="text-xs text-slate-600">{formatRelative(job.createdAt)}</span>
+                          {job.attempts > 0 && (
+                            <span className="text-xs text-slate-600">Attempt {job.attempts}</span>
+                          )}
+                        </div>
+                        {job.errorReason && (
+                          <p className="text-xs text-red-400 mt-1 truncate">{job.errorReason}</p>
                         )}
                       </div>
-                      {job.errorReason && (
-                        <p className="text-xs text-red-400 mt-1 truncate">{job.errorReason}</p>
-                      )}
                     </div>
-                    {job.pullRequests.length > 0 && (
-                      <a
-                        href={job.pullRequests[0].htmlUrl}
-                        target="_blank" rel="noreferrer"
-                        onClick={e => e.stopPropagation()}
-                        className="text-xs text-indigo-400 hover:text-indigo-300 whitespace-nowrap"
-                      >
-                        View PR #{job.pullRequests[0].pullRequestNumber}
-                      </a>
-                    )}
-                  </div>
-                </Card>
-              </Link>
+                  </Card>
+                </Link>
+                {job.pullRequests.length > 0 && (
+                  <a
+                    href={job.pullRequests[0].htmlUrl}
+                    target="_blank" rel="noreferrer"
+                    className="text-xs text-indigo-400 hover:text-indigo-300 whitespace-nowrap flex-shrink-0"
+                  >
+                    View PR #{job.pullRequests[0].pullRequestNumber}
+                  </a>
+                )}
+              </div>
             ))}
           </div>
 

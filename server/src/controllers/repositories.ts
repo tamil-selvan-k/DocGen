@@ -6,6 +6,61 @@ import asyncHandler from '../utils/asyncHandler';
 import prisma from '../utils/prisma';
 import { addDocJob } from '../queue';
 import { logger } from '../utils/logger';
+import { config } from '../config/env';
+
+// Returns a valid access token for the user's linked GitHub account.
+// Attempts a token refresh when the token is expired and a refresh_token is stored.
+// Deletes the stale DB record and throws a 401 when the token cannot be recovered.
+async function getValidGitHubToken(userId: string): Promise<{ account: NonNullable<Awaited<ReturnType<typeof prisma.gitHubAccount.findUnique>>>; token: string }> {
+  const account = await prisma.gitHubAccount.findUnique({ where: { userId } });
+  if (!account) throw new ApiError('No GitHub account connected. Please connect your GitHub account first.', 400);
+
+  // If no expiry is stored the token is a classic OAuth token (no expiry), use as-is.
+  if (!account.expiresAt || account.expiresAt > new Date()) {
+    return { account, token: account.accessToken };
+  }
+
+  // Token is expired — attempt refresh if we have a refresh_token.
+  if (account.refreshToken) {
+    const refreshRes = await fetch('https://github.com/login/oauth/access_token', {
+      method: 'POST',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        client_id: config.GITHUB_CLIENT_ID,
+        client_secret: config.GITHUB_CLIENT_SECRET,
+        grant_type: 'refresh_token',
+        refresh_token: account.refreshToken,
+      }),
+    });
+
+    if (refreshRes.ok) {
+      const data = (await refreshRes.json()) as {
+        access_token?: string;
+        refresh_token?: string;
+        expires_in?: number;
+        error?: string;
+      };
+
+      if (data.access_token) {
+        const expiresAt = data.expires_in ? new Date(Date.now() + data.expires_in * 1000) : null;
+        const updated = await prisma.gitHubAccount.update({
+          where: { userId },
+          data: {
+            accessToken: data.access_token,
+            refreshToken: data.refresh_token ?? account.refreshToken,
+            expiresAt,
+          },
+        });
+        logger.info(`Refreshed GitHub OAuth token for user ${userId}`);
+        return { account: updated, token: updated.accessToken };
+      }
+    }
+  }
+
+  // Cannot recover — remove the dead record so the UI shows "not connected".
+  await prisma.gitHubAccount.delete({ where: { userId } }).catch(() => {});
+  throw new ApiError('GitHub authorization expired or revoked. Please reconnect your GitHub account in Settings.', 401);
+}
 
 const syncSchema = z.object({
   commitSha: z.string().regex(/^[0-9a-f]{40}$/i, 'Invalid commit SHA format').optional(),
@@ -18,23 +73,25 @@ const syncSchema = z.object({
 export const listRepositories = asyncHandler(async (req: Request, res: Response) => {
   if (!req.user) throw new ApiError('Unauthorized', 401);
 
-  const githubAccount = await prisma.gitHubAccount.findUnique({
-    where: { userId: req.user.id },
-  });
-
-  if (!githubAccount) {
-    throw new ApiError('No GitHub account connected. Please connect your GitHub account first.', 400);
-  }
+  const { account: githubAccount, token } = await getValidGitHubToken(req.user.id);
 
   const ghResponse = await fetch('https://api.github.com/user/repos?sort=updated&per_page=50', {
     headers: {
-      Authorization: `Bearer ${githubAccount.accessToken}`,
+      Authorization: `Bearer ${token}`,
       Accept: 'application/vnd.github+json',
-      'User-Agent': 'AutoDocs-AI',
+      'User-Agent': 'DocGen-AI',
     },
   });
 
-  if (!ghResponse.ok) throw new ApiError('Failed to fetch repositories from GitHub', 502);
+  if (!ghResponse.ok) {
+    const errBody = await ghResponse.text().catch(() => 'unknown error body');
+    logger.error(`Failed to fetch repositories from GitHub: Status ${ghResponse.status}, Body: ${errBody}`);
+    if (ghResponse.status === 401) {
+      await prisma.gitHubAccount.delete({ where: { userId: req.user.id } }).catch(() => {});
+      throw new ApiError('GitHub authorization expired or revoked. Please reconnect your GitHub account in Settings.', 401);
+    }
+    throw new ApiError(`Failed to fetch repositories from GitHub: status ${ghResponse.status}`, 502);
+  }
 
   const ghRepos = (await ghResponse.json()) as Array<{
     id: number;
@@ -76,18 +133,15 @@ export const listRepositories = asyncHandler(async (req: Request, res: Response)
 export const getRepository = asyncHandler(async (req: Request, res: Response) => {
   if (!req.user) throw new ApiError('Unauthorized', 401);
 
-  const githubAccount = await prisma.gitHubAccount.findUnique({
-    where: { userId: req.user.id },
-  });
-  if (!githubAccount) throw new ApiError('No GitHub account connected', 400);
+  const { token } = await getValidGitHubToken(req.user.id);
 
   const id = String(req.params.id);
 
   const ghResponse = await fetch(`https://api.github.com/repositories/${id}`, {
     headers: {
-      Authorization: `Bearer ${githubAccount.accessToken}`,
+      Authorization: `Bearer ${token}`,
       Accept: 'application/vnd.github+json',
-      'User-Agent': 'AutoDocs-AI',
+      'User-Agent': 'DocGen-AI',
     },
   });
 
@@ -134,9 +188,7 @@ export const syncRepository = asyncHandler(async (req: Request, res: Response) =
 
   const [owner, repoName] = repository.fullName.split('/');
 
-  // Auto-resolve installation from DB — match by owner (targetId)
-  const githubAccount = await prisma.gitHubAccount.findUnique({ where: { userId: req.user.id } });
-  if (!githubAccount) throw new ApiError('No GitHub account connected', 400);
+  const { token: githubToken } = await getValidGitHubToken(req.user.id);
 
   // Find the installation that covers this repository's owner
   const installation = await prisma.gitHubInstallation.findFirst({
@@ -152,19 +204,28 @@ export const syncRepository = asyncHandler(async (req: Request, res: Response) =
 
   const installationId = installation.id;
 
-  // Resolve commit SHA — use provided or fetch latest from GitHub
+  // Resolve default branch and commit SHA from GitHub
+  const repoInfoRes = await fetch(`https://api.github.com/repos/${owner}/${repoName}`, {
+    headers: {
+      Authorization: `Bearer ${githubToken}`,
+      Accept: 'application/vnd.github+json',
+      'User-Agent': 'DocGen-AI',
+    },
+  });
+  if (!repoInfoRes.ok) throw new ApiError('Failed to fetch repository info from GitHub', 502);
+  const repoInfo = (await repoInfoRes.json()) as { default_branch: string };
+  const defaultBranch = repoInfo.default_branch;
+
   let commitSha = parsed.data.commitSha;
 
   if (!commitSha) {
-
-    // Simplified: fetch default branch ref
     const refRes = await fetch(
-      `https://api.github.com/repos/${owner}/${repoName}/git/ref/heads/main`,
+      `https://api.github.com/repos/${owner}/${repoName}/git/ref/heads/${defaultBranch}`,
       {
         headers: {
-          Authorization: `Bearer ${githubAccount.accessToken}`,
+          Authorization: `Bearer ${githubToken}`,
           Accept: 'application/vnd.github+json',
-          'User-Agent': 'AutoDocs-AI',
+          'User-Agent': 'DocGen-AI',
         },
       }
     );
@@ -196,7 +257,7 @@ export const syncRepository = asyncHandler(async (req: Request, res: Response) =
     installationId,
     owner,
     repo: repoName,
-    defaultBranch: 'main',
+    defaultBranch,
   });
 
   await prisma.auditLog.create({
