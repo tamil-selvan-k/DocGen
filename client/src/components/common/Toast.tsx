@@ -24,13 +24,19 @@ const styles = {
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const dismiss = (id: string) => setToasts(t => t.filter(x => x.id !== id));
+  const timers = React.useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+
+  const dismiss = useCallback((id: string) => {
+    const t = timers.current.get(id);
+    if (t) { clearTimeout(t); timers.current.delete(id); }
+    setToasts(prev => prev.filter(x => x.id !== id));
+  }, []);
 
   const toast = useCallback((type: ToastType, message: string) => {
     const id = Math.random().toString(36).slice(2);
     setToasts(t => [...t, { id, type, message }]);
-    setTimeout(() => dismiss(id), 4000);
-  }, []);
+    timers.current.set(id, setTimeout(() => dismiss(id), 4000));
+  }, [dismiss]);
 
   const success = useCallback((m: string) => toast('success', m), [toast]);
   const error = useCallback((m: string) => toast('error', m), [toast]);

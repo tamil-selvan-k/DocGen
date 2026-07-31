@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { LayoutDashboard, GitBranch, Clock, CheckCircle, XCircle, Loader2, ExternalLink } from 'lucide-react';
+import { LayoutDashboard, GitBranch, Clock, CheckCircle, XCircle, Loader2, ExternalLink, AlertTriangle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { jobsApi } from '@/api/jobs.api';
 import { repositoriesApi } from '@/api/repositories.api';
@@ -29,13 +29,13 @@ function StatCard({ icon: Icon, label, value, color }: { icon: React.ElementType
 export default function Dashboard() {
   const { user } = useAuth();
 
-  const { data: reposData, isLoading: reposLoading } = useQuery({
+  const { data: reposData, isLoading: reposLoading, isError: reposError } = useQuery({
     queryKey: ['repositories'],
     queryFn: () => repositoriesApi.list(),
     select: r => r.data.data,
   });
 
-  const { data: recentJobs, isLoading: jobsLoading } = useQuery({
+  const { data: recentJobs, isLoading: jobsLoading, isError: jobsError } = useQuery({
     queryKey: ['jobs', { limit: 10 }],
     queryFn: () => jobsApi.list({ limit: 10 }),
     select: r => r.data.data,
@@ -78,6 +78,8 @@ export default function Dashboard() {
           />
           {jobsLoading ? (
             <div className="space-y-3">{[...Array(4)].map((_, i) => <SkeletonCard key={i} />)}</div>
+          ) : jobsError ? (
+            <div className="flex items-center gap-2 text-sm text-red-400 py-4"><AlertTriangle className="w-4 h-4" />Failed to load jobs</div>
           ) : !recentJobs?.length ? (
             <EmptyState icon={Clock} title="No jobs yet" description="Jobs appear after a push event or manual sync" />
           ) : (
@@ -105,6 +107,8 @@ export default function Dashboard() {
           />
           {reposLoading ? (
             <div className="space-y-3">{[...Array(4)].map((_, i) => <SkeletonCard key={i} />)}</div>
+          ) : reposError ? (
+            <div className="flex items-center gap-2 text-sm text-red-400 py-4"><AlertTriangle className="w-4 h-4" />Failed to load repositories</div>
           ) : !reposData?.length ? (
             <EmptyState icon={GitBranch} title="No repositories" description="Connect your GitHub account to see repositories" />
           ) : (

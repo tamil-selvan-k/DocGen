@@ -16,8 +16,8 @@ export function formatRelative(dateStr: string): string {
   return `${days}d ago`;
 }
 
-export function shortSha(sha: string): string {
-  return sha.slice(0, 7);
+export function shortSha(sha: string | null | undefined): string {
+  return sha ? sha.slice(0, 7) : '???????';
 }
 
 export function truncate(str: string, max = 60): string {

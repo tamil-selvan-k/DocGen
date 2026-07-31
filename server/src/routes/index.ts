@@ -15,7 +15,7 @@ apiRouter.get('/health', (req, res) => {
     success: true,
     data: { status: 'OK', uptime: process.uptime(), timestamp: new Date().toISOString() },
     error: null,
-    meta: { message: 'AutoDocs AI API is healthy' },
+    meta: { message: 'DocGen AI API is healthy' },
   });
 });
 

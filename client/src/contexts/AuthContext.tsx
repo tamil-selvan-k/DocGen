@@ -24,12 +24,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(res.data.data);
     } catch {
       setUser(null);
+      throw new Error('Session could not be verified');
     }
   }, []);
 
-  // Restore session on mount
+  // Restore session on mount — errors here are expected (no active session)
   useEffect(() => {
-    refreshUser().finally(() => setIsLoading(false));
+    refreshUser().catch(() => {}).finally(() => setIsLoading(false));
   }, [refreshUser]);
 
   const login = async (email: string, password: string) => {

@@ -41,7 +41,7 @@ export default function Register() {
           <div className="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center">
             <Zap className="w-5 h-5 text-white" />
           </div>
-          <span className="text-xl font-semibold text-slate-100">AutoDocs AI</span>
+          <span className="text-xl font-semibold text-slate-100">DocGen AI</span>
         </div>
 
         <div className="card p-7">

@@ -46,9 +46,11 @@ model Repository {
   fullName       String
   private        Boolean
   htmlUrl        String
-  createdAt      DateTime           @default(now())
-  updatedAt      DateTime           @updatedAt
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
   jobs           DocumentationJob[]
+  versions       DocumentationVersion[]
+  pullRequests   PullRequest[]
 }
 
 model GitHubInstallation {
@@ -88,6 +90,7 @@ model DocumentationJob {
 model DocumentationVersion {
   id           String           @id @default(uuid())
   repositoryId String
+  repository   Repository       @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
   commitSha    String
   filePath     String
   content      String
@@ -99,6 +102,7 @@ model DocumentationVersion {
 model PullRequest {
   id                String           @id @default(uuid())
   repositoryId      String
+  repository        Repository       @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
   jobId             String
   job               DocumentationJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
   pullRequestNumber Int

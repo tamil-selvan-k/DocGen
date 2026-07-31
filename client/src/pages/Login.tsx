@@ -41,12 +41,12 @@ export default function Login() {
           <div className="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center">
             <Zap className="w-5 h-5 text-white" />
           </div>
-          <span className="text-xl font-semibold text-slate-100">AutoDocs AI</span>
+          <span className="text-xl font-semibold text-slate-100">DocGen AI</span>
         </div>
 
         <div className="card p-7">
           <h1 className="text-lg font-semibold text-slate-100 mb-1">Sign in</h1>
-          <p className="text-sm text-slate-500 mb-6">Welcome back to AutoDocs AI</p>
+          <p className="text-sm text-slate-500 mb-6">Welcome back to DocGen AI</p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <Input

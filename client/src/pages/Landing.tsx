@@ -18,7 +18,7 @@ export default function Landing() {
           <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
             <Zap className="w-4 h-4 text-white" />
           </div>
-          <span className="font-semibold text-slate-100">AutoDocs AI</span>
+          <span className="font-semibold text-slate-100">DocGen AI</span>
         </div>
         <div className="flex items-center gap-3">
           <Link to="/login" className="btn-ghost">Sign in</Link>
@@ -40,7 +40,7 @@ export default function Landing() {
           </h1>
 
           <p className="text-lg text-slate-400 max-w-lg mx-auto mb-8 leading-relaxed">
-            AutoDocs AI watches your GitHub repos. Every commit triggers AI documentation generation and opens a Pull Request — zero manual work.
+            DocGen AI watches your GitHub repos. Every commit triggers AI documentation generation and opens a Pull Request — zero manual work.
           </p>
 
           <div className="flex items-center justify-center gap-3 flex-wrap">
@@ -71,7 +71,7 @@ export default function Landing() {
       </main>
 
       <footer className="text-center py-6 text-xs text-slate-600 border-t border-[#1e2640]">
-        © {new Date().getFullYear()} AutoDocs AI. All rights reserved.
+        © {new Date().getFullYear()} DocGen AI. All rights reserved.
       </footer>
     </div>
   );

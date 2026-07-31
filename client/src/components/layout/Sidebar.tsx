@@ -33,7 +33,7 @@ export function Sidebar() {
         <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
           <Zap className="w-4 h-4 text-white" />
         </div>
-        <span className="font-semibold text-slate-100">AutoDocs AI</span>
+        <span className="font-semibold text-slate-100">DocGen AI</span>
       </div>
 
       {/* Nav */}

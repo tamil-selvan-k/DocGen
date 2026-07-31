@@ -98,9 +98,8 @@ Do not wrap your response in any text other than valid JSON. Return ONLY JSON.
       
       return evaluation;
     } catch (error) {
-      logger.warn('Failed to parse Gemini validation response, defaulting to true', error);
-      // Fallback check: if parsing fails, return safe defaults
-      return { isValid: true };
+      logger.warn('Failed to parse Gemini validation response, defaulting to invalid', error);
+      return { isValid: false, reason: 'Validation response could not be parsed' };
     }
   }
 }

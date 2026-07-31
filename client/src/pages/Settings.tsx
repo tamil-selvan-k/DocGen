@@ -53,7 +53,7 @@ export default function SettingsPage() {
   const logoutMutation = useMutation({
     mutationFn: () => logout(),
     onSuccess: () => { success('Logged out'); navigate('/login'); },
-    onError: () => error('Logout failed'),
+    onError: () => { error('Logout failed'); setConfirmLogout(false); },
   });
 
   const githubConnectUrl = githubApi.getConnectUrl();
@@ -126,16 +126,23 @@ export default function SettingsPage() {
             <p className="text-sm text-slate-300 font-medium">Sign out</p>
             <p className="text-xs text-slate-500">End your current session</p>
           </div>
-          <Button variant="danger" loading={logoutMutation.isPending} onClick={() => {
-            if (confirmLogout) {
-              logoutMutation.mutate();
-            } else {
-              setConfirmLogout(true);
-            }
-          }}>
-            <Trash2 className="w-4 h-4" />
-            {confirmLogout ? 'Confirm Logout' : 'Logout'}
-          </Button>
+          <div className="flex items-center gap-2">
+            {confirmLogout && (
+              <Button variant="secondary" size="sm" onClick={() => setConfirmLogout(false)}>
+                Cancel
+              </Button>
+            )}
+            <Button variant="danger" loading={logoutMutation.isPending} onClick={() => {
+              if (confirmLogout) {
+                logoutMutation.mutate();
+              } else {
+                setConfirmLogout(true);
+              }
+            }}>
+              <Trash2 className="w-4 h-4" />
+              {confirmLogout ? 'Confirm Logout' : 'Logout'}
+            </Button>
+          </div>
         </div>
       </Card>
     </div>
