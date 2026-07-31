@@ -25,7 +25,7 @@ Documentation can also be triggered manually from the web dashboard.
 | GitHub | OAuth App + GitHub App (webhooks, installation tokens) |
 
 ## Prerequisites
-
+ 
 - Node.js 20+
 - pnpm
 - PostgreSQL (default port 5422 in dev)
