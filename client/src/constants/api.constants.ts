@@ -11,6 +11,7 @@ export const ENDPOINTS = {
 
   // GitHub
   GITHUB_CONNECT: '/github/connect',
+  GITHUB_INSTALL: '/github/install',
 
   // Repositories
   REPOSITORIES: '/repositories',

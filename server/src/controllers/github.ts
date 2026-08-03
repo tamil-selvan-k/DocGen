@@ -3,9 +3,12 @@ import { Request, Response } from 'express';
 import { config } from '../config/env';
 import { ApiError } from '../utils/ApiError';
 import { ApiResponse } from '../utils/ApiResponse';
+import jwt from 'jsonwebtoken';
 import asyncHandler from '../utils/asyncHandler';
 import prisma from '../utils/prisma';
 import { logger } from '../utils/logger';
+
+import { GitHubClient } from '../utils/github';
 
 /**
  * GET /api/v1/github/connect  (protected)
@@ -129,4 +132,33 @@ export const callback = asyncHandler(async (req: Request, res: Response) => {
 
   // Redirect to frontend with GitHub username as success indicator
   res.redirect(`${config.CLIENT_URL}/github/callback?github_username=${encodeURIComponent(ghUser.login)}`);
+});
+
+/**
+ * GET /api/v1/github/install  (protected)
+ * Dynamically resolves the GitHub App HTML URL and redirects the user to the installations page.
+ */
+export const installApp = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) throw new ApiError('Unauthorized', 401);
+
+  const appJwt = GitHubClient.generateAppJwt();
+  console.log(jwt.decode(appJwt, { complete: true }));
+  const response = await fetch('https://api.github.com/app', {
+    headers: {
+      Authorization: `Bearer ${appJwt}`,
+      Accept: 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+      'User-Agent': 'DocGen-AI',
+    },
+  });
+
+  if (!response.ok) {
+    const errText = await response.text().catch(() => 'unknown');
+    console.log(response);
+    logger.error(`Failed to fetch GitHub App details: Status ${response.status}, Body: ${errText}`);
+    throw new ApiError('Failed to fetch GitHub App details from GitHub', 502);
+  }
+
+  const appData = (await response.json()) as { html_url: string };
+  res.redirect(`${appData.html_url}/installations/new?state=${req.user.id}`);
 });

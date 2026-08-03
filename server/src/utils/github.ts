@@ -26,7 +26,7 @@ export class GitHubClient {
     const payload = {
       iat: now - 60, // 1 minute clock skew buffer
       exp: now + 9 * 60, // 9 minutes expiry
-      iss: config.GITHUB_APP_ID,
+      iss: parseInt(config.GITHUB_APP_ID, 10),
     };
 
     const privateKey = getGitHubPrivateKey();

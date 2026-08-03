@@ -7,6 +7,9 @@ export const githubApi = {
   /** Returns full connect URL — browser navigates to this to start OAuth */
   getConnectUrl: (): string => `/api/v1${ENDPOINTS.GITHUB_CONNECT}`,
 
+  /** Returns full App installation URL — browser navigates to this to install/configure repositories */
+  getInstallUrl: (): string => `/api/v1${ENDPOINTS.GITHUB_INSTALL}`,
+
   listOrganizations: () =>
     client.get<ApiResponse<Organization[]>>(ENDPOINTS.ORGANIZATIONS),
 

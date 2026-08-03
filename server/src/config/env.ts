@@ -18,6 +18,7 @@ const envSchema = z.object({
   GITHUB_APP_ID: z.string().min(1, "GITHUB_APP_ID is required"),
   GITHUB_PRIVATE_KEY: z.string().min(1, "GITHUB_PRIVATE_KEY (Base64-encoded PEM) is required"),
   GITHUB_WEBHOOK_SECRET: z.string().min(1, "GITHUB_WEBHOOK_SECRET is required"),
+  GITHUB_APP_NAME: z.string().default('docgen-ai'),
   GEMINI_API_KEY: z.string().min(1, "GEMINI_API_KEY is required"),
   GEMINI_MODEL: z.string().default('gemini-1.5-flash'),
 
@@ -46,14 +47,6 @@ export const config = parseEnv();
  * Returns the decoded GITHUB_PRIVATE_KEY.
  * The environment variable is expected to be a Base64-encoded PEM private key.
  */
-export const getGitHubPrivateKey = (): string => {
-  const decoded = Buffer.from(config.GITHUB_PRIVATE_KEY, 'base64').toString('utf8');
-  if (decoded.includes('-----BEGIN PRIVATE KEY-----') || decoded.includes('-----BEGIN RSA PRIVATE KEY-----')) {
-    return decoded;
-  }
-  // Not valid Base64-encoded PEM — use the raw value (already a PEM string)
-  if (config.GITHUB_PRIVATE_KEY.includes('-----BEGIN')) {
-    return config.GITHUB_PRIVATE_KEY;
-  }
-  throw new Error('GITHUB_PRIVATE_KEY is not a valid PEM key or Base64-encoded PEM key');
+export const getGitHubPrivateKey = () => {
+  return config.GITHUB_PRIVATE_KEY.replace(/\\n/g, "\n").trim();
 };

@@ -57,6 +57,7 @@ export default function SettingsPage() {
   });
 
   const githubConnectUrl = githubApi.getConnectUrl();
+  const githubInstallUrl = githubApi.getInstallUrl();
 
   return (
     <div className="space-y-8 max-w-2xl">
@@ -90,13 +91,24 @@ export default function SettingsPage() {
       <Card>
         <CardHeader title="GitHub Integration" icon={<Github className="w-4 h-4 text-slate-400" />} />
         {user?.github ? (
-          <div className="flex items-center gap-3">
-            <CheckCircle className="w-5 h-5 text-green-400" />
-            <div>
-              <p className="text-sm text-slate-200 font-medium">Connected as @{user.github.username}</p>
-              <p className="text-xs text-slate-500">Your GitHub account is linked</p>
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <CheckCircle className="w-5 h-5 text-green-400" />
+              <div>
+                <p className="text-sm text-slate-200 font-medium">Connected as @{user.github.username}</p>
+                <p className="text-xs text-slate-500">Your GitHub account is linked</p>
+              </div>
+              <Badge variant="success" className="ml-auto">Connected</Badge>
             </div>
-            <Badge variant="success" className="ml-auto">Connected</Badge>
+            <div className="pt-4 border-t border-[#1e2640] flex flex-col gap-2 items-start">
+              <p className="text-xs text-slate-500">
+                To generate documentation and open PRs, the GitHub App must be installed on your repositories.
+              </p>
+              <a href={githubInstallUrl} className="btn-secondary inline-flex items-center gap-2">
+                <Github className="w-4 h-4" />
+                Configure Repositories (Install App)
+              </a>
+            </div>
           </div>
         ) : (
           <div className="space-y-3">
