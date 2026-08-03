@@ -69,6 +69,10 @@ Required variables:
 - `GITHUB_WEBHOOK_SECRET` — HMAC secret set in your GitHub App webhook settings
 - `GEMINI_API_KEY` — Google Gemini API key
 
+Optional variables:
+- `GEMINI_MODEL` — The Gemini model used for generation (defaults to `gemini-3.5-flash`)
+- `GITHUB_APP_NAME` — The name of the GitHub App (defaults to `docgen-ai`)
+
 ### 3. Set up the database
 
 ```bash
