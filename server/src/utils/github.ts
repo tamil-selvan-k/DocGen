@@ -34,6 +34,30 @@ export class GitHubClient {
   }
 
   /**
+   * Resolves the GitHub App installation ID for a specific repository.
+   * Authenticates using the App's JWT.
+   */
+  public static async getRepositoryInstallationId(owner: string, repo: string): Promise<string> {
+    const appJwt = this.generateAppJwt();
+    const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/installation`, {
+      headers: {
+        'Authorization': `Bearer ${appJwt}`,
+        'Accept': 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+        'User-Agent': 'DocGen-AI',
+      },
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`Failed to get installation for repo ${owner}/${repo} (${response.status}): ${errText}`);
+    }
+
+    const data = (await response.json()) as { id: number };
+    return String(data.id);
+  }
+
+  /**
    * Retrieves an installation access token for a specific installation ID.
    * Caches tokens in-memory until they expire.
    */

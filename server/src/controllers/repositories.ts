@@ -7,6 +7,7 @@ import prisma from '../utils/prisma';
 import { addDocJob } from '../queue';
 import { logger } from '../utils/logger';
 import { config } from '../config/env';
+import { GitHubClient } from '../utils/github';
 
 // Returns a valid access token for the user's linked GitHub account.
 // Attempts a token refresh when the token is expired and a refresh_token is stored.
@@ -182,27 +183,90 @@ export const syncRepository = asyncHandler(async (req: Request, res: Response) =
   const parsed = syncSchema.safeParse(req.body);
   if (!parsed.success) throw new ApiError('Validation failed', 400, parsed.error.issues);
 
+  const { token: githubToken } = await getValidGitHubToken(req.user.id);
+
   // Resolve repository record
-  const repository = await prisma.repository.findUnique({ where: { id: repositoryId } });
-  if (!repository) throw new ApiError('Repository not found. Push a commit first to register it.', 404);
+  let repository = await prisma.repository.findUnique({ where: { id: repositoryId } });
+  if (!repository) {
+    const ghResponse = await fetch(`https://api.github.com/repositories/${repositoryId}`, {
+      headers: {
+        Authorization: `Bearer ${githubToken}`,
+        Accept: 'application/vnd.github+json',
+        'User-Agent': 'DocGen-AI',
+      },
+    });
+
+    if (ghResponse.status === 404) throw new ApiError('Repository not found on GitHub', 404);
+    if (!ghResponse.ok) throw new ApiError('Failed to fetch repository details from GitHub to register it', 502);
+
+    const repoData = (await ghResponse.json()) as {
+      id: number;
+      name: string;
+      full_name: string;
+      private: boolean;
+      html_url: string;
+      owner: { id: number; login: string; avatar_url?: string };
+    };
+
+    // Ensure Organization exists
+    let organization = await prisma.organization.findUnique({ where: { id: String(repoData.owner.id) } });
+    if (!organization) {
+      organization = await prisma.organization.create({
+        data: {
+          id: String(repoData.owner.id),
+          name: repoData.owner.login,
+          avatarUrl: repoData.owner.avatar_url || null,
+        },
+      });
+    }
+
+    // Register repository reference on-the-fly
+    repository = await prisma.repository.create({
+      data: {
+        id: String(repoData.id),
+        organizationId: organization.id,
+        name: repoData.name,
+        fullName: repoData.full_name,
+        private: repoData.private,
+        htmlUrl: repoData.html_url,
+      },
+    });
+  }
 
   const [owner, repoName] = repository.fullName.split('/');
 
-  const { token: githubToken } = await getValidGitHubToken(req.user.id);
-
   // Find the installation that covers this repository's owner
-  const installation = await prisma.gitHubInstallation.findFirst({
+  let installation = await prisma.gitHubInstallation.findFirst({
     where: { targetId: String(repository.organizationId) },
   });
 
-  if (!installation) {
-    throw new ApiError(
-      'No GitHub App installation found for this repository. Please install the GitHub App on your organization/account first.',
-      400
-    );
-  }
+  let installationId: string;
 
-  const installationId = installation.id;
+  if (installation) {
+    installationId = installation.id;
+  } else {
+    try {
+      // Query GitHub API directly using GitHub App JWT
+      installationId = await GitHubClient.getRepositoryInstallationId(owner, repoName);
+      
+      // Save it to DB for future requests
+      await prisma.gitHubInstallation.create({
+        data: {
+          id: installationId,
+          targetType: 'User',
+          targetId: String(repository.organizationId),
+          repositorySelection: 'selected',
+        },
+      });
+      logger.info(`Resolved and saved GitHub App installation ${installationId} for owner ${repository.organizationId} on-the-fly`);
+    } catch (err: any) {
+      logger.error(`Failed to resolve installation for ${owner}/${repoName}:`, err);
+      throw new ApiError(
+        'No GitHub App installation found for this repository. Please install the GitHub App on your organization/account first.',
+        400
+      );
+    }
+  }
 
   // Resolve default branch and commit SHA from GitHub
   const repoInfoRes = await fetch(`https://api.github.com/repos/${owner}/${repoName}`, {
