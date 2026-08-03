@@ -67,7 +67,7 @@ Required variables:
 - `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` — GitHub OAuth App credentials
 - `GITHUB_APP_ID` / `GITHUB_PRIVATE_KEY` — GitHub App credentials (key is Base64-encoded PEM)
 - `GITHUB_WEBHOOK_SECRET` — HMAC secret set in your GitHub App webhook settings
-- `GEMINI_API_KEY` — Google AI Studio API key
+- `GEMINI_API_KEY` — Google Gemini API key
 
 ### 3. Set up the database
 
