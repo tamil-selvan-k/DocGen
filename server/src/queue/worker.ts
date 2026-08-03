@@ -99,8 +99,7 @@ async function processDocJob(job: Job<DocJobData>): Promise<void> {
 
     const commitDetail = await GitHubClient.apiRequest<CommitDetail>(
       `/repos/${owner}/${repo}/commits/${commitSha}`,
-      await GitHubClient.getInstallationToken(installationId),
-      { headers: { Accept: 'application/vnd.github.v3.diff' } }
+      await GitHubClient.getInstallationToken(installationId)
     );
 
     // Build a unified diff string from file patches
