@@ -4,7 +4,7 @@ import { AlertTriangle } from 'lucide-react';
 
 export function NotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0a0d14]">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--color-bg)]">
       <div className="text-center">
         <p className="text-7xl font-black text-indigo-500/20 mb-4">404</p>
         <AlertTriangle className="w-10 h-10 text-amber-400 mx-auto mb-3" />
@@ -18,7 +18,7 @@ export function NotFound() {
 
 export function Forbidden() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0a0d14]">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--color-bg)]">
       <div className="text-center">
         <p className="text-7xl font-black text-red-500/20 mb-4">403</p>
         <h1 className="text-xl font-semibold text-slate-100 mb-2">Access Denied</h1>
@@ -31,7 +31,7 @@ export function Forbidden() {
 
 export function ServerError() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0a0d14]">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--color-bg)]">
       <div className="text-center">
         <p className="text-7xl font-black text-red-500/20 mb-4">500</p>
         <h1 className="text-xl font-semibold text-slate-100 mb-2">Server Error</h1>

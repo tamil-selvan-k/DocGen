@@ -40,7 +40,7 @@ export default function GitHubCallback() {
   }, []);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0a0d14]">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--color-bg)]">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
         className="card p-10 text-center max-w-sm w-full"

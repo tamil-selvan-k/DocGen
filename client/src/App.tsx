@@ -20,6 +20,11 @@ import Profile from '@/pages/Profile';
 import { NotFound, Forbidden, ServerError } from '@/pages/errors/ErrorPages';
 
 export default function App() {
+  React.useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') || 'midnight';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  }, []);
+
   return (
     <BrowserRouter>
       <AppProviders>

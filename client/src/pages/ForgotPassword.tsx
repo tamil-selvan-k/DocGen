@@ -5,7 +5,7 @@ import { Badge } from '@/components/common/Badge';
 
 export default function ForgotPassword() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0a0d14] px-4">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--color-bg)] px-4">
       <div className="w-full max-w-sm card p-8 text-center">
         <div className="flex items-center justify-center gap-2 mb-6">
           <img src="/logo.webp" alt="Logo" className="w-8 h-8 rounded-lg object-cover flex-shrink-0" />

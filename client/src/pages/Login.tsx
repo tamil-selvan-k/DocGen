@@ -10,6 +10,7 @@ import { Input } from '@/components/common/Input';
 import { PasswordInput } from '@/components/common/PasswordInput';
 import { Button } from '@/components/common/Button';
 import { loginSchema, type LoginFormValues } from '@/validators/auth.validators';
+import { API_BASE_URL } from '@/constants/api.constants';
 
 export default function Login() {
   const { login } = useAuth();
@@ -80,7 +81,7 @@ export default function Login() {
           </div>
 
           <a
-            href="/api/v1/github/oauth-login"
+            href={`${API_BASE_URL}/github/oauth-login`}
             className="btn-secondary w-full flex items-center justify-center gap-2"
           >
             <Github className="w-4 h-4" />

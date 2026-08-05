@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, GitBranch, Briefcase, Settings, LogOut, Zap, User as UserIcon } from 'lucide-react';
+import { LayoutDashboard, GitBranch, Briefcase, Settings, LogOut, User as UserIcon } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const NAV = [
@@ -32,14 +32,14 @@ export function Sidebar({ isMobileOpen, onMobileClose, isCollapsed, onLogoutClic
 
       {/* Sidebar aside */}
       <aside
-        className={`flex flex-col min-h-screen border-r border-[#1e2640] bg-[#0d1017] flex-shrink-0 transition-all duration-200 z-50
+        className={`flex flex-col min-h-screen border-r border-[var(--color-border)] bg-[var(--color-surface)] flex-shrink-0 transition-all duration-200 z-50
           fixed md:sticky top-0 bottom-0 left-0 h-screen
           ${isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
           ${isCollapsed ? 'md:w-16 w-60' : 'w-60'}
         `}
       >
         {/* Logo & Mobile Close */}
-        <div className={`flex items-center px-4 py-5 border-b border-[#1e2640] ${isCollapsed ? 'md:justify-center justify-between' : 'justify-between'}`}>
+        <div className={`flex items-center px-4 py-5 border-b border-[var(--color-border)] ${isCollapsed ? 'md:justify-center justify-between' : 'justify-between'}`}>
           <div className="flex items-center gap-2.5 min-w-0">
             <img src="/logo.webp" alt="Logo" className="w-8 h-8 rounded-lg object-cover flex-shrink-0" />
             {/* Show label if sidebar is not collapsed OR if in mobile drawer */}
@@ -79,13 +79,13 @@ export function Sidebar({ isMobileOpen, onMobileClose, isCollapsed, onLogoutClic
         </nav>
 
         {/* User profile & Logout footer */}
-        <div className="border-t border-[#1e2640] p-3 flex flex-col gap-2 bg-[#0d1017]">
+        <div className="border-t border-[var(--color-border)] p-3 flex flex-col gap-2 bg-[var(--color-surface)]">
           {/* User profile NavLink */}
           <NavLink
             to="/app/profile"
             onClick={() => onMobileClose()}
             title={isCollapsed ? 'View Profile' : undefined}
-            className={`flex items-center gap-3 p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-[#1e2640] transition-all duration-150 ${
+            className={`flex items-center gap-3 p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-[var(--color-border)] transition-all duration-150 ${
               isCollapsed ? 'md:justify-center' : ''
             }`}
           >

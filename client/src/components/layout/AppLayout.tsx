@@ -28,9 +28,9 @@ export function AppLayout() {
   };
 
   return (
-    <div className="flex h-full min-h-screen bg-[#0a0d14]">
+    <div className="flex h-full min-h-screen bg-[var(--color-bg)]">
       {/* Mobile Top Header */}
-      <header className="md:hidden fixed top-0 left-0 right-0 h-16 bg-[#0d1017] border-b border-[#1e2640] flex items-center justify-between px-4 z-40">
+      <header className="md:hidden fixed top-0 left-0 right-0 h-16 bg-[var(--color-surface)] border-b border-[var(--color-border)] flex items-center justify-between px-4 z-40">
         <div className="flex items-center gap-2.5">
           <button
             onClick={() => setIsSidebarOpen(true)}
@@ -54,12 +54,12 @@ export function AppLayout() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Desktop Top Header Bar */}
-        <header className="hidden md:flex h-16 bg-[#0d1017] border-b border-[#1e2640] items-center justify-between px-6 sticky top-0 z-30">
+        <header className="hidden md:flex h-16 bg-[var(--color-surface)] border-b border-[var(--color-border)] items-center justify-between px-6 sticky top-0 z-30">
           <div className="flex items-center gap-4">
             {/* Sidebar toggle button (matching GateZentry layout) */}
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
-              className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-[#1e2640] rounded-lg transition-colors focus:outline-none"
+              className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-[var(--color-border)] rounded-lg transition-colors focus:outline-none"
               title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
             >
               {isCollapsed ? (
@@ -78,7 +78,7 @@ export function AppLayout() {
         </header>
 
         {/* Content Body */}
-        <main className="flex-1 overflow-auto bg-[#0a0d14] pt-16 md:pt-0">
+        <main className="flex-1 overflow-auto bg-[var(--color-bg)] pt-16 md:pt-0">
           <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-8">
             <Outlet />
           </div>

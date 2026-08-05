@@ -73,6 +73,13 @@ export default function SettingsPage() {
   const [visitedTabs, setVisitedTabs] = useState<Record<string, boolean>>({
     profile: true,
   });
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'midnight');
+
+  const handleThemeChange = (newTheme: string) => {
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme);
+  };
 
   const handleTabChange = (tabId: 'profile' | 'security' | 'integrations' | 'danger') => {
     setActiveTab(tabId);
@@ -155,31 +162,63 @@ export default function SettingsPage() {
           {/* Profile Tab */}
           <div className={activeTab === 'profile' ? 'block' : 'hidden'}>
             {visitedTabs.profile && (
-              <Card>
-                <CardHeader title="Account Details" description="Your basic profile metadata" />
-                <dl className="grid grid-cols-1 gap-y-4 gap-x-6 sm:grid-cols-2">
-                  <div className="border-b border-[#1e2640] sm:border-0 pb-3 sm:pb-0">
-                    <dt className="text-xs text-slate-500 mb-0.5">Email address</dt>
-                    <dd className="text-sm font-medium text-slate-200">{user?.email}</dd>
+              <>
+                <Card>
+                  <CardHeader title="Account Details" description="Your basic profile metadata" />
+                  <dl className="grid grid-cols-1 gap-y-4 gap-x-6 sm:grid-cols-2">
+                    <div className="border-b border-[#1e2640] sm:border-0 pb-3 sm:pb-0">
+                      <dt className="text-xs text-slate-500 mb-0.5">Email address</dt>
+                      <dd className="text-sm font-medium text-slate-200">{user?.email}</dd>
+                    </div>
+                    <div className="border-b border-[#1e2640] sm:border-0 pb-3 sm:pb-0">
+                      <dt className="text-xs text-slate-500 mb-0.5">Account created</dt>
+                      <dd className="text-sm font-medium text-slate-200">
+                        {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : '—'}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs text-slate-500 mb-0.5">Integration status</dt>
+                      <dd className="text-sm mt-1">
+                        {user?.github ? (
+                          <Badge variant="success">Connected to @{user.github.username}</Badge>
+                        ) : (
+                          <Badge variant="default">No github connected</Badge>
+                        )}
+                      </dd>
+                    </div>
+                  </dl>
+                </Card>
+
+                <Card className="mt-6">
+                  <CardHeader title="Appearance Settings" description="Customize the application visual theme" />
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {[
+                      { id: 'midnight', label: 'Midnight (Default)', desc: 'Sleek dark indigo workspace', color: 'bg-[#6366f1]' },
+                      { id: 'slate-emerald', label: 'Slate Emerald', desc: 'Deep slate with forest greens', color: 'bg-[#10b981]' },
+                      { id: 'cyberpunk', label: 'Cyberpunk', desc: 'Neon pink highlights and pitch backdrops', color: 'bg-[#d946ef]' },
+                    ].map(t => (
+                      <button
+                        key={t.id}
+                        onClick={() => handleThemeChange(t.id)}
+                        className={`p-4 rounded-xl border text-left transition-all duration-200 flex flex-col justify-between h-32 focus:outline-none ${
+                          theme === t.id
+                            ? 'border-indigo-500 bg-indigo-500/5 ring-1 ring-indigo-500'
+                            : 'border-[var(--color-border)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-2)]'
+                        }`}
+                      >
+                        <div>
+                          <span className="text-xs font-semibold text-slate-200 block">{t.label}</span>
+                          <span className="text-[10px] text-slate-500 mt-1.5 block leading-normal">{t.desc}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 mt-4">
+                          <div className={`w-2.5 h-2.5 rounded-full ${t.color}`} />
+                          <span className="text-[10px] font-mono text-slate-400 uppercase">{t.id}</span>
+                        </div>
+                      </button>
+                    ))}
                   </div>
-                  <div className="border-b border-[#1e2640] sm:border-0 pb-3 sm:pb-0">
-                    <dt className="text-xs text-slate-500 mb-0.5">Account created</dt>
-                    <dd className="text-sm font-medium text-slate-200">
-                      {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : '—'}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs text-slate-500 mb-0.5">Integration status</dt>
-                    <dd className="text-sm mt-1">
-                      {user?.github ? (
-                        <Badge variant="success">Connected to @{user.github.username}</Badge>
-                      ) : (
-                        <Badge variant="default">No github connected</Badge>
-                      )}
-                    </dd>
-                  </div>
-                </dl>
-              </Card>
+                </Card>
+              </>
             )}
           </div>
 

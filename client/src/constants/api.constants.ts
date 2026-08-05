@@ -1,4 +1,5 @@
-export const API_BASE_URL = '/api/v1';
+const customApiUrl = import.meta.env.VITE_API_URL;
+export const API_BASE_URL = customApiUrl ? `${customApiUrl}/api/v1` : '/api/v1';
 
 export const ENDPOINTS = {
   // Auth
