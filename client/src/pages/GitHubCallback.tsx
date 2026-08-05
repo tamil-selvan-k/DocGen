@@ -14,18 +14,25 @@ export default function GitHubCallback() {
 
   const githubUsername = params.get('github_username');
   const errorParam = params.get('error');
+  const action = params.get('action');
 
   useEffect(() => {
     const handle = async () => {
       if (githubUsername) {
         await refreshUser();
-        success(`GitHub account @${githubUsername} connected!`);
-        setTimeout(() => navigate('/app/settings'), 1500);
+        if (action === 'login') {
+          success(`Logged in with GitHub as @${githubUsername}`);
+          setTimeout(() => navigate('/app/dashboard'), 1200);
+        } else {
+          success(`GitHub account @${githubUsername} connected!`);
+          setTimeout(() => navigate('/app/settings'), 1200);
+        }
       } else if (errorParam) {
         error(`GitHub connection failed: ${errorParam.replace(/_/g, ' ')}`);
-        setTimeout(() => navigate('/app/settings'), 2000);
+        const redirectPath = action === 'login' ? '/login' : '/app/settings';
+        setTimeout(() => navigate(redirectPath), 2000);
       } else {
-        navigate('/app/settings');
+        navigate(action === 'login' ? '/app/dashboard' : '/app/settings');
       }
     };
     handle();

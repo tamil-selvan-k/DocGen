@@ -8,9 +8,7 @@ export default function ForgotPassword() {
     <div className="min-h-screen flex items-center justify-center bg-[#0a0d14] px-4">
       <div className="w-full max-w-sm card p-8 text-center">
         <div className="flex items-center justify-center gap-2 mb-6">
-          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
-            <Zap className="w-4 h-4 text-white" />
-          </div>
+          <img src="/logo.webp" alt="Logo" className="w-8 h-8 rounded-lg object-cover flex-shrink-0" />
         </div>
         <Badge variant="warning" className="mb-4">Coming Soon</Badge>
         <h1 className="text-lg font-semibold text-slate-100 mb-2">Forgot Password</h1>

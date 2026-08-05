@@ -8,6 +8,8 @@ export const ENDPOINTS = {
   REFRESH: '/auth/refresh',
   ME: '/auth/me',
   CHANGE_PASSWORD: '/auth/password',
+  DELETE_ACCOUNT: '/auth/delete',
+  AUDIT_LOGS: '/auth/audit-logs',
 
   // GitHub
   GITHUB_CONNECT: '/github/connect',

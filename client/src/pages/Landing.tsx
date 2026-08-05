@@ -15,9 +15,7 @@ export default function Landing() {
       {/* Nav */}
       <nav className="flex items-center justify-between px-8 py-5 border-b border-[#1e2640]">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
-            <Zap className="w-4 h-4 text-white" />
-          </div>
+          <img src="/logo.webp" alt="Logo" className="w-8 h-8 rounded-lg object-cover flex-shrink-0" />
           <span className="font-semibold text-slate-100">DocGen AI</span>
         </div>
         <div className="flex items-center gap-3">

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, FileText, GitPullRequest, AlertTriangle } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { jobsApi } from '@/api/jobs.api';
@@ -46,6 +46,7 @@ function VersionModal({ jobId, version, open, onClose }: {
 export default function JobDetail() {
   const { id } = useParams<{ id: string }>();
   const [selectedVersion, setSelectedVersion] = useState<DocumentationVersion | null>(null);
+  const navigate = useNavigate();
 
   const { data: job, isLoading, isError } = useQuery({
     queryKey: ['job', id],
@@ -80,11 +81,16 @@ export default function JobDetail() {
   );
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Link to="/app/jobs" className="btn-ghost p-2">
-          <ArrowLeft className="w-4 h-4" />
-        </Link>
+    <div>
+      <button
+        onClick={() => navigate(-1)}
+        className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-indigo-400 transition-colors mb-3 focus:outline-none"
+      >
+        <ArrowLeft className="w-3.5 h-3.5" />
+        <span>Back</span>
+      </button>
+
+      <div className="space-y-6">
         <div>
           <h1 className="text-xl font-bold text-slate-100">{job.repository?.fullName}</h1>
           <div className="flex items-center gap-2 mt-0.5">
@@ -92,7 +98,6 @@ export default function JobDetail() {
             <Badge variant={job.status as JobStatus} dot>{job.status}</Badge>
           </div>
         </div>
-      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Details */}
@@ -187,5 +192,6 @@ export default function JobDetail() {
         onClose={() => setSelectedVersion(null)}
       />
     </div>
+  </div>
   );
 }

@@ -16,6 +16,7 @@ import Repositories from '@/pages/Repositories';
 import Jobs from '@/pages/Jobs';
 import JobDetail from '@/pages/JobDetail';
 import SettingsPage from '@/pages/Settings';
+import Profile from '@/pages/Profile';
 import { NotFound, Forbidden, ServerError } from '@/pages/errors/ErrorPages';
 
 export default function App() {
@@ -46,6 +47,7 @@ export default function App() {
                 <Route path="jobs" element={<Jobs />} />
                 <Route path="jobs/:id" element={<JobDetail />} />
                 <Route path="settings" element={<SettingsPage />} />
+                <Route path="profile" element={<Profile />} />
               </Route>
             </Route>
 

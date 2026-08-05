@@ -21,4 +21,10 @@ export const authApi = {
 
   changePassword: (currentPassword: string, newPassword: string) =>
     client.patch<ApiResponse<null>>(ENDPOINTS.CHANGE_PASSWORD, { currentPassword, newPassword }),
+
+  deleteAccount: () =>
+    client.delete<ApiResponse<null>>(ENDPOINTS.DELETE_ACCOUNT),
+
+  getAuditLogs: () =>
+    client.get<ApiResponse<any[]>>(ENDPOINTS.AUDIT_LOGS),
 };

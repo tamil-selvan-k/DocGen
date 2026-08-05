@@ -2,7 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate } from 'react-router-dom';
-import { Zap } from 'lucide-react';
+import { Zap, Github } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/components/common/Toast';
@@ -38,9 +38,7 @@ export default function Login() {
         className="w-full max-w-sm"
       >
         <div className="flex items-center justify-center gap-2 mb-8">
-          <div className="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center">
-            <Zap className="w-5 h-5 text-white" />
-          </div>
+          <img src="/logo.webp" alt="Logo" className="w-9 h-9 rounded-lg object-cover flex-shrink-0" />
           <span className="text-xl font-semibold text-slate-100">DocGen AI</span>
         </div>
 
@@ -73,6 +71,21 @@ export default function Login() {
               Sign in
             </Button>
           </form>
+
+          <div className="relative my-5 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-[#1e2640]"></div>
+            </div>
+            <span className="relative px-3 text-xs text-slate-500 bg-[#111520]">or continue with</span>
+          </div>
+
+          <a
+            href="/api/v1/github/oauth-login"
+            className="btn-secondary w-full flex items-center justify-center gap-2"
+          >
+            <Github className="w-4 h-4" />
+            Continue with GitHub
+          </a>
 
           <p className="text-center text-sm text-slate-500 mt-5">
             No account?{' '}

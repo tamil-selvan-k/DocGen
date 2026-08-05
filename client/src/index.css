@@ -32,6 +32,14 @@
   ::-webkit-scrollbar-thumb:hover { background: var(--color-muted); }
 
   ::selection { background: #6366f133; }
+
+  button,
+  a,
+  [role="button"],
+  input[type="submit"],
+  input[type="button"] {
+    cursor: pointer;
+  }
 }
 
 @layer components {
