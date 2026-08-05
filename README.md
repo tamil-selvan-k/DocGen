@@ -51,6 +51,7 @@ cd ../client && pnpm install
 
 ### 2. Configure environment
 
+#### Backend Environment Variables
 ```bash
 cp server/.env.example server/.env
 ```
@@ -72,6 +73,11 @@ Required variables:
 Optional variables:
 - `GEMINI_MODEL` — The Gemini model used for generation (defaults to `gemini-3.5-flash`)
 - `GITHUB_APP_NAME` — The name of the GitHub App (defaults to `docgen-ai`)
+
+#### Frontend Environment Variables
+You can optionally configure a custom API URL for the frontend by setting the environment variable below in your client environment or a `.env` file within the `client` directory:
+
+- `VITE_API_URL` — Custom API base URL (e.g., `http://localhost:5000`). If not provided, API routes default to relative pathing (`/api/v1`).
 
 ### 3. Set up the database
 
@@ -98,9 +104,34 @@ cd server && pnpm dev
 cd client && pnpm dev
 ```
 
-The API runs on `http://localhost:5000` and the frontend on `http://localhost:5173`.
+The API runs on `http://localhost:5000`. The frontend runs on `http://localhost:5173` and proxies `/api` requests to `http://127.0.0.1:5000`.
 
-## Production build
+## Themes and Customization
+
+The application features a built-in theme system configurable via the **Settings -> Appearance Settings** section. Themes are stored in `localStorage` under the `theme` key and loaded dynamically on application start by applying a `data-theme` attribute to the root HTML element.
+
+### Available Themes
+*   **Midnight (Default)** (`midnight`): A sleek dark indigo workspace.
+*   **Slate Emerald** (`slate-emerald`): A deep slate background with forest green accents.
+*   **Cyberpunk** (`cyberpunk`): Neon pink highlights and pitch backdrops.
+
+## Production and Deployment
+
+### Frontend Deployment on Vercel
+The frontend includes a `client/vercel.json` configuration file which sets up rewrites to ensure Single Page Application (SPA) routing behaves correctly:
+
+```json
+{
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
+```
+
+### Build Steps
 
 ```bash
 # Build frontend
@@ -122,7 +153,7 @@ node --import tsx/esm src/tests/foundation.test.ts
 
 ## API overview
 
-All routes are prefixed with `/api/v1`.
+All routes are prefixed with `/api/v1` (or custom URL mapped through `VITE_API_URL`).
 
 | Method | Path | Auth | Description |
 |---|---|---|---|
@@ -144,11 +175,13 @@ All routes are prefixed with `/api/v1`.
 
 ```
 ├── client/                  # React frontend (separate pnpm project)
+│   ├── vercel.json          # Vercel routing configuration
 │   └── src/
 │       ├── api/             # Axios API layer
-│       ├── components/      # Shared UI components
+│       ├── components/      # Shared UI components & Layouts
+│       ├── constants/       # Client API endpoint variables
 │       ├── contexts/        # AuthContext
-│       ├── pages/           # Route-level page components
+│       ├── pages/           # Route-level page components (Settings, Profile, etc.)
 │       └── types/           # TypeScript types
 │
 └── server/                  # Express backend (separate pnpm project)
