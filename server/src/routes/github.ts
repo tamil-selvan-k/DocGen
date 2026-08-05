@@ -1,8 +1,11 @@
 import { Router } from 'express';
-import { connect, callback, installApp } from '../controllers/github';
+import { connect, callback, installApp, oauthLogin } from '../controllers/github';
 import authenticate from '../middleware/auth';
 
 const router = Router();
+
+// GET /api/v1/github/oauth-login  (public — redirects to GitHub login)
+router.get('/oauth-login', oauthLogin);
 
 // GET /api/v1/github/connect  (protected — redirects to GitHub OAuth)
 router.get('/connect', authenticate, connect);

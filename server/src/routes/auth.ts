@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { signup, login, me, refresh, logout, changePassword } from '../controllers/auth';
+import { signup, login, me, refresh, logout, changePassword, deleteAccount, getAuditLogs } from '../controllers/auth';
 import authenticate from '../middleware/auth';
 
 const router = Router();
@@ -21,5 +21,11 @@ router.get('/me', authenticate, me);
 
 // PATCH /api/v1/auth/password  (protected)
 router.patch('/password', authenticate, changePassword);
+
+// DELETE /api/v1/auth/delete  (protected)
+router.delete('/delete', authenticate, deleteAccount);
+
+// GET /api/v1/auth/audit-logs  (protected)
+router.get('/audit-logs', authenticate, getAuditLogs);
 
 export default router;

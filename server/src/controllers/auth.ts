@@ -28,10 +28,24 @@ const changePasswordSchema = z.object({
 
 // ── Token helpers ─────────────────────────────────────────────────────────────
 
+const isCrossDomain = (() => {
+  try {
+    const clientHost = new URL(config.CLIENT_URL).hostname;
+    const serverHost = new URL(config.SERVER_URL).hostname;
+    const clientParts = clientHost.split('.');
+    const serverParts = serverHost.split('.');
+    const clientBase = clientParts.slice(-2).join('.');
+    const serverBase = serverParts.slice(-2).join('.');
+    return clientBase !== serverBase;
+  } catch (err) {
+    return true; // Fallback to safe cross-domain handling
+  }
+})();
+
 const COOKIE_OPTS = {
   httpOnly: true,
-  secure: config.NODE_ENV === 'production',
-  sameSite: 'lax' as const,
+  secure: config.NODE_ENV === 'production' || isCrossDomain,
+  sameSite: (config.NODE_ENV === 'production' && isCrossDomain) ? ('none' as const) : ('lax' as const),
 };
 
 const signAccessToken = (userId: string, email: string): string =>
@@ -40,7 +54,7 @@ const signAccessToken = (userId: string, email: string): string =>
 const signRefreshToken = (userId: string): string =>
   jwt.sign({ userId }, config.JWT_REFRESH_SECRET, { expiresIn: '7d' });
 
-function setAuthCookies(res: Response, userId: string, email: string) {
+export function setAuthCookies(res: Response, userId: string, email: string) {
   const accessToken = signAccessToken(userId, email);
   const refreshToken = signRefreshToken(userId);
 
@@ -169,4 +183,39 @@ export const changePassword = asyncHandler(async (req: Request, res: Response) =
   // Rotate cookies after password change
   setAuthCookies(res, user.id, user.email);
   return new ApiResponse(200, null, 'Password changed successfully');
+});
+
+export const deleteAccount = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) throw new ApiError('Unauthorized', 401);
+
+  const userId = req.user.id;
+
+  // Delete user record (cascades GitHubAccount)
+  await prisma.user.delete({ where: { id: userId } });
+
+  // Clear auth cookies
+  res.clearCookie('accessToken', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+  });
+  res.clearCookie('refreshToken', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+  });
+
+  return new ApiResponse(200, null, 'Account deleted successfully');
+});
+
+export const getAuditLogs = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) throw new ApiError('Unauthorized', 401);
+
+  const logs = await prisma.auditLog.findMany({
+    where: { userId: req.user.id },
+    orderBy: { createdAt: 'desc' },
+    take: 15,
+  });
+
+  return new ApiResponse(200, logs);
 });

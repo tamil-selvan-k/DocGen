@@ -10,6 +10,9 @@ import { config } from './config/env';
 
 const app = express();
 
+// Trust reverse proxy headers (e.g. ngrok, Vercel, Render)
+app.set('trust proxy', 1);
+
 // HTTP Request Logging - morgan('common') only as per design specification
 app.use(morgan('common'));
 

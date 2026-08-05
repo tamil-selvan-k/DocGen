@@ -48,5 +48,17 @@ export const config = parseEnv();
  * The environment variable is expected to be a Base64-encoded PEM private key.
  */
 export const getGitHubPrivateKey = () => {
-  return config.GITHUB_PRIVATE_KEY.replace(/\\n/g, "\n").trim();
+  const rawKey = config.GITHUB_PRIVATE_KEY.trim();
+  if (rawKey.includes('-----BEGIN')) {
+    return rawKey.replace(/\\n/g, "\n");
+  }
+  try {
+    const decoded = Buffer.from(rawKey, 'base64').toString('utf8');
+    if (decoded.includes('-----BEGIN')) {
+      return decoded.replace(/\\n/g, "\n");
+    }
+  } catch (err) {
+    // fallback to original behavior
+  }
+  return rawKey.replace(/\\n/g, "\n");
 };
