@@ -86,7 +86,7 @@ export default function Dashboard() {
             <div className="space-y-2">
               {recentJobs.slice(0, 6).map(job => (
                 <Link key={job.id} to={`/app/jobs/${job.id}`}
-                  className="flex items-center justify-between p-3 rounded-lg hover:bg-[#1a1f35] transition-colors group"
+                  className="flex items-center justify-between p-3 rounded-lg hover:bg-[var(--color-surface-2)] transition-colors group"
                 >
                   <div className="min-w-0">
                     <p className="text-sm text-slate-200 truncate font-mono">{job.repository?.fullName}</p>
@@ -114,7 +114,7 @@ export default function Dashboard() {
           ) : (
             <div className="space-y-2">
               {reposData.slice(0, 6).map(repo => (
-                <div key={repo.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-[#1a1f35] transition-colors">
+                <div key={repo.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-[var(--color-surface-2)] transition-colors">
                   <div className="min-w-0">
                     <p className="text-sm text-slate-200 truncate">{repo.fullName}</p>
                     <p className="text-xs text-slate-500 mt-0.5">{repo.private ? 'Private' : 'Public'}</p>

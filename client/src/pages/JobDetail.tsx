@@ -92,7 +92,21 @@ export default function JobDetail() {
 
       <div className="space-y-6">
         <div>
-          <h1 className="text-xl font-bold text-slate-100">{job.repository?.fullName}</h1>
+          <h1 className="text-xl font-bold text-slate-100">
+            {job.repository?.htmlUrl ? (
+              <a
+                href={job.repository.htmlUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="hover:text-indigo-400 transition-colors inline-flex items-center gap-1.5"
+              >
+                {job.repository.fullName}
+                <ExternalLink className="w-4 h-4 text-slate-500 hover:text-indigo-400 transition-colors" />
+              </a>
+            ) : (
+              job.repository?.fullName
+            )}
+          </h1>
           <div className="flex items-center gap-2 mt-0.5">
             <span className="font-mono text-xs text-slate-500">{shortSha(job.commitSha)}</span>
             <Badge variant={job.status as JobStatus} dot>{job.status}</Badge>
@@ -120,9 +134,9 @@ export default function JobDetail() {
               ))}
             </dl>
             {job.errorReason && (
-              <div className="mt-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-                <p className="text-xs text-red-400 font-medium mb-1">Error</p>
-                <p className="text-xs text-red-300">{job.errorReason}</p>
+              <div className="mt-4 p-3 rounded-lg bg-[var(--color-error-bg)] border border-[var(--color-error-border)]">
+                <p className="text-xs text-[var(--color-error-text)] font-semibold mb-1">Error</p>
+                <p className="text-xs text-[var(--color-error-text)] font-mono leading-relaxed">{job.errorReason}</p>
               </div>
             )}
           </Card>

@@ -176,9 +176,9 @@ export default function Jobs() {
 
               {/* Bottom Error Section (if FAILED) */}
               {job.status === 'FAILED' && job.errorReason && (
-                <div className="px-3.5 py-2.5 rounded-lg bg-rose-950/20 border border-rose-900/25 flex items-start gap-2.5">
-                  <AlertTriangle className="w-4 h-4 text-rose-400 flex-shrink-0 mt-0.5" />
-                  <p className="text-xs text-rose-300/90 leading-relaxed font-mono">
+                <div className="px-3.5 py-2.5 rounded-lg bg-[var(--color-error-bg)] border border-[var(--color-error-border)] flex items-start gap-2.5">
+                  <AlertTriangle className="w-4 h-4 text-[var(--color-error-text)] flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-[var(--color-error-text)] leading-relaxed font-mono">
                     {job.errorReason}
                   </p>
                 </div>
