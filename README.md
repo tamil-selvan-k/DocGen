@@ -120,6 +120,22 @@ cd server
 node --import tsx/esm src/tests/foundation.test.ts
 ```
 
+## UI & Design System
+
+The frontend application features a responsive layout powered by theme-aware CSS custom properties and semantic styling rules.
+
+### Theme-Aware CSS Variables
+The application UI supports multiple theme contexts using standard CSS variables:
+- **Error Styling:** Error indicators, details, and callouts utilize dynamic error-theme CSS variables:
+  - `--color-error-bg`: Background color for error panels.
+  - `--color-error-text`: Text and foreground color for error descriptions.
+  - `--color-error-border`: Border color for error components.
+- **Surface Hovers:** Interactive list elements across the Dashboard utilize standard background tokens (`var(--color-surface-2)`) instead of hardcoded static colors to support unified hover behavior.
+
+### User Interface Enhancements
+- **External Repository Integration:** On the Job Details view, the repository name functions as an active link that redirects directly to the corresponding GitHub repository URL when available, annotated with an external link indicator.
+- **Consistent Error States:** Errors on both the main Jobs feed and the individual Job Details page display using standardized error design tokens and monospace layouts for improved error diagnosis.
+
 ## API overview
 
 All routes are prefixed with `/api/v1`.
