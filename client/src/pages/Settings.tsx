@@ -191,11 +191,12 @@ export default function SettingsPage() {
 
                 <Card className="mt-6">
                   <CardHeader title="Appearance Settings" description="Customize the application visual theme" />
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                     {[
                       { id: 'midnight', label: 'Midnight (Default)', desc: 'Sleek dark indigo workspace', color: 'bg-[#6366f1]' },
                       { id: 'slate-emerald', label: 'Slate Emerald', desc: 'Deep slate with forest greens', color: 'bg-[#10b981]' },
-                      { id: 'cyberpunk', label: 'Cyberpunk', desc: 'Neon pink highlights and pitch backdrops', color: 'bg-[#d946ef]' },
+                      { id: 'cyberpunk', label: 'Cyberpunk', desc: 'Neon pink and pitch backdrops', color: 'bg-[#d946ef]' },
+                      { id: 'light', label: 'Light Theme', desc: 'Clean high-contrast slate interface', color: 'bg-[#4f46e5]' },
                     ].map(t => (
                       <button
                         key={t.id}
