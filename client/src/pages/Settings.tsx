@@ -136,7 +136,7 @@ export default function SettingsPage() {
       {/* Main Grid Wrapper */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-start">
         {/* Settings Tab Sidebar */}
-        <div className="md:col-span-1 flex md:flex-col gap-1 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0 border-b md:border-b-0 border-[#1e2640]">
+        <div className="md:col-span-1 flex md:flex-col gap-1 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0 border-b md:border-b-0 border-[var(--color-border)]">
           {tabs.map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -147,7 +147,7 @@ export default function SettingsPage() {
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-150 ${
                   isActive
                     ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/20 md:w-full text-left'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-[#1e2640] md:w-full text-left'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-[var(--color-surface-2)] md:w-full text-left'
                 }`}
               >
                 <Icon className={`w-4 h-4 ${isActive ? 'text-indigo-400' : 'text-slate-500'}`} />
@@ -166,11 +166,11 @@ export default function SettingsPage() {
                 <Card>
                   <CardHeader title="Account Details" description="Your basic profile metadata" />
                   <dl className="grid grid-cols-1 gap-y-4 gap-x-6 sm:grid-cols-2">
-                    <div className="border-b border-[#1e2640] sm:border-0 pb-3 sm:pb-0">
+                    <div className="border-b border-[var(--color-border)] sm:border-0 pb-3 sm:pb-0">
                       <dt className="text-xs text-slate-500 mb-0.5">Email address</dt>
                       <dd className="text-sm font-medium text-slate-200">{user?.email}</dd>
                     </div>
-                    <div className="border-b border-[#1e2640] sm:border-0 pb-3 sm:pb-0">
+                    <div className="border-b border-[var(--color-border)] sm:border-0 pb-3 sm:pb-0">
                       <dt className="text-xs text-slate-500 mb-0.5">Account created</dt>
                       <dd className="text-sm font-medium text-slate-200">
                         {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : '—'}
@@ -243,7 +243,7 @@ export default function SettingsPage() {
                       </div>
                       <Badge variant="success" className="ml-auto">Connected</Badge>
                     </div>
-                    <div className="pt-4 border-t border-[#1e2640] flex flex-col gap-2 items-start">
+                    <div className="pt-4 border-t border-[var(--color-border)] flex flex-col gap-2 items-start">
                       <p className="text-xs text-slate-500 leading-relaxed">
                         To synchronize repository updates and deploy automatic docs generation workflows, configure the DocGen AI App on your target repositories.
                       </p>
@@ -296,7 +296,7 @@ export default function SettingsPage() {
           </div>
           <div className="space-y-2">
             <p className="text-sm text-slate-400">
-              To verify deletion, please type <span className="font-mono text-slate-200 font-semibold bg-[#1a1f35] px-1.5 py-0.5 rounded border border-[#1e2640]">delete my account</span> below:
+              To verify deletion, please type <span className="font-mono text-slate-200 font-semibold bg-[var(--color-surface-2)] px-1.5 py-0.5 rounded border border-[var(--color-border)]">delete my account</span> below:
             </p>
             <Input
               placeholder="delete my account"
@@ -304,7 +304,7 @@ export default function SettingsPage() {
               onChange={e => setDeleteConfirmationText(e.target.value)}
             />
           </div>
-          <div className="flex gap-3 justify-end pt-3 border-t border-[#1e2640]">
+          <div className="flex gap-3 justify-end pt-3 border-t border-[var(--color-border)]">
             <Button variant="secondary" onClick={() => { setShowDeleteModal(false); setDeleteConfirmationText(''); }}>
               Cancel
             </Button>

@@ -64,7 +64,7 @@ export function Sidebar({ isMobileOpen, onMobileClose, isCollapsed, onLogoutClic
                 } ${
                   isActive
                     ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-600/20'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-[#1e2640]'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-[var(--color-surface-2)]'
                 }`
               }
             >

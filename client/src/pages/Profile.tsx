@@ -88,7 +88,7 @@ export default function Profile() {
             </h2>
             <p className="text-xs text-slate-500 truncate max-w-full mb-4">{user?.email}</p>
             
-            <div className="w-full border-t border-[#1e2640] pt-4 mt-2 space-y-3 text-left">
+            <div className="w-full border-t border-[var(--color-border)] pt-4 mt-2 space-y-3 text-left">
               <div className="flex items-center gap-2 text-xs text-slate-400">
                 <Calendar className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" />
                 <span>Joined {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : '—'}</span>
@@ -133,11 +133,11 @@ export default function Profile() {
             ) : !logs?.length ? (
               <div className="text-center py-8 text-xs text-slate-500">No recent activity logged</div>
             ) : (
-              <div className="relative border-l border-[#1e2640] ml-3 pl-6 space-y-6 pt-2">
+              <div className="relative border-l border-[var(--color-border)] ml-3 pl-6 space-y-6 pt-2">
                 {logs.map((log: AuditLog) => (
                   <div key={log.id} className="relative">
                     {/* Timeline Node Icon Circle */}
-                    <span className="absolute -left-[35px] top-0 bg-[#0d1017] border border-[#1e2640] w-6 h-6 rounded-full flex items-center justify-center shadow-sm">
+                    <span className="absolute -left-[35px] top-0 bg-[var(--color-surface-2)] border border-[var(--color-border)] w-6 h-6 rounded-full flex items-center justify-center shadow-sm">
                       <LogActionIcon action={log.action} />
                     </span>
                     

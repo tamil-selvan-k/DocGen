@@ -47,7 +47,7 @@ function SyncModal({ repo, open, onClose }: { repo: Repository | null; open: boo
           onChange={e => setCommitSha(e.target.value)}
           hint="Leave empty to auto-resolve the latest commit"
         />
-        <div className="flex gap-3 justify-end pt-3 border-t border-[#1e2640]">
+        <div className="flex gap-3 justify-end pt-3 border-t border-[var(--color-border)]">
           <Button variant="secondary" onClick={handleClose}>Cancel</Button>
           <Button loading={mutation.isPending} onClick={() => mutation.mutate()}>
             <RefreshCw className="w-4 h-4" /> Sync Now
@@ -128,7 +128,7 @@ export default function Repositories() {
               className={`px-3.5 py-1.5 rounded-full text-xs font-medium border transition-colors capitalize ${
                 filter === f
                   ? 'bg-indigo-600/20 text-indigo-300 border-indigo-600/40'
-                  : 'bg-transparent text-slate-400 border-[#1e2640] hover:border-slate-600'
+                  : 'bg-transparent text-slate-400 border-[var(--color-border)] hover:border-slate-600'
               }`}
             >
               {f}
@@ -144,7 +144,7 @@ export default function Repositories() {
           {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : isError ? (
-        <div className="flex flex-col items-center justify-center py-12 text-slate-400 border border-dashed border-[#1e2640] rounded-xl gap-2">
+        <div className="flex flex-col items-center justify-center py-12 text-slate-400 border border-dashed border-[var(--color-border)] rounded-xl gap-2">
           <AlertTriangle className="w-8 h-8 text-red-400" />
           <p className="text-sm">Failed to load repositories.</p>
           <Button variant="secondary" size="sm" onClick={() => window.location.reload()}>
@@ -165,12 +165,12 @@ export default function Repositories() {
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {paginated.map(repo => (
-              <Card key={repo.id} className="hover:border-indigo-600/30 hover:shadow-lg hover:shadow-indigo-900/5 transition-all duration-200 flex flex-col justify-between h-full bg-[#111520] p-5">
+              <Card key={repo.id} className="hover:border-indigo-600/30 hover:shadow-lg hover:shadow-indigo-900/5 transition-all duration-200 flex flex-col justify-between h-full bg-[var(--color-surface)] p-5">
                 <div className="space-y-3">
                   {/* Repo Info Header */}
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-10 h-10 rounded-lg bg-[#161b2e] border border-[#1e2640] flex items-center justify-center flex-shrink-0">
+                      <div className="w-10 h-10 rounded-lg bg-[var(--color-surface-2)] border border-[var(--color-border)] flex items-center justify-center flex-shrink-0">
                         <GitFork className="w-5 h-5 text-indigo-400" />
                       </div>
                       <div className="min-w-0">
@@ -203,7 +203,7 @@ export default function Repositories() {
                 </div>
 
                 {/* Bottom Metadata & Actions */}
-                <div className="pt-4 mt-4 border-t border-[#1e2640] flex items-center justify-between text-xs">
+                <div className="pt-4 mt-4 border-t border-[var(--color-border)] flex items-center justify-between text-xs">
                   <span className="text-slate-500 font-mono">
                     Updated {formatRelative(repo.updatedAt)}
                   </span>
@@ -212,7 +212,7 @@ export default function Repositories() {
                       href={repo.htmlUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="btn-ghost p-2 rounded-lg hover:bg-[#1e2640]"
+                      className="btn-ghost p-2 rounded-lg hover:bg-[var(--color-surface-2)]"
                       title="View on GitHub"
                     >
                       <ExternalLink className="w-4 h-4" />
@@ -233,7 +233,7 @@ export default function Repositories() {
 
           {/* Pagination Toolbar */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between pt-4 border-t border-[#1e2640] mt-6">
+             <div className="flex items-center justify-between pt-4 border-t border-[var(--color-border)] mt-6">
               <p className="text-xs text-slate-500">
                 Page <span className="text-slate-300 font-medium">{page}</span> of <span className="text-slate-300 font-medium">{totalPages}</span> · {filtered.length} repositories
               </p>

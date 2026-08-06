@@ -11,9 +11,9 @@ const features = [
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-[#0a0d14] flex flex-col">
+    <div className="min-h-screen bg-[var(--color-bg)] flex flex-col">
       {/* Nav */}
-      <nav className="flex items-center justify-between px-8 py-5 border-b border-[#1e2640]">
+      <nav className="flex items-center justify-between px-8 py-5 border-b border-[var(--color-border)]">
         <div className="flex items-center gap-2">
           <img src="/logo.webp" alt="Logo" className="w-8 h-8 rounded-lg object-cover flex-shrink-0" />
           <span className="font-semibold text-slate-100">DocGen AI</span>
@@ -68,7 +68,7 @@ export default function Landing() {
         </motion.div>
       </main>
 
-      <footer className="text-center py-6 text-xs text-slate-600 border-t border-[#1e2640]">
+      <footer className="text-center py-6 text-xs text-slate-600 border-t border-[var(--color-border)]">
         © {new Date().getFullYear()} DocGen AI. All rights reserved.
       </footer>
     </div>

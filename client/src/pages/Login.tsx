@@ -75,9 +75,9 @@ export default function Login() {
 
           <div className="relative my-5 flex items-center justify-center">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-[#1e2640]"></div>
+              <div className="w-full border-t border-[var(--color-border)]"></div>
             </div>
-            <span className="relative px-3 text-xs text-slate-500 bg-[#111520]">or continue with</span>
+            <span className="relative px-3 text-xs text-slate-500 bg-[var(--color-surface)]">or continue with</span>
           </div>
 
           <a

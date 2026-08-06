@@ -95,7 +95,7 @@ export function AppLayout() {
           <p className="text-sm text-slate-400">
             Are you sure you want to log out of your session? You will need to sign in again to access your documentation projects.
           </p>
-          <div className="flex gap-3 justify-end pt-3 border-t border-[#1e2640]">
+          <div className="flex gap-3 justify-end pt-3 border-t border-[var(--color-border)]">
             <Button variant="secondary" onClick={() => setShowLogoutModal(false)}>
               Cancel
             </Button>

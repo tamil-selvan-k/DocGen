@@ -1,5 +1,5 @@
 export function Skeleton({ className = '' }: { className?: string }) {
-  return <div className={`animate-pulse bg-[#1e2640] rounded-lg ${className}`} />;
+  return <div className={`animate-pulse bg-[var(--color-border)] rounded-lg ${className}`} />;
 }
 
 export function SkeletonText({ lines = 3 }: { lines?: number }) {

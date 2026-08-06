@@ -35,7 +35,7 @@ function VersionModal({ jobId, version, open, onClose }: {
           <AlertTriangle className="w-4 h-4" />Failed to load documentation content
         </div>
       ) : (
-        <div className="prose prose-invert prose-sm max-w-none max-h-[70vh] overflow-auto bg-[#0d1017] rounded-lg p-4">
+        <div className="prose prose-sm max-w-none max-h-[70vh] overflow-auto bg-[var(--color-surface-2)] border border-[var(--color-border)] text-[var(--color-text)] rounded-lg p-4">
           <ReactMarkdown>{data?.content ?? ''}</ReactMarkdown>
         </div>
       )}
@@ -133,7 +133,7 @@ export default function JobDetail() {
               <CardHeader title="Documentation Versions" description="Click to view full content" />
               <div className="space-y-2">
                 {job.versions.map(v => (
-                  <div key={v.id} className="p-3 rounded-lg bg-[#0d1017] border border-[#1e2640]">
+                  <div key={v.id} className="p-3 rounded-lg bg-[var(--color-surface-2)] border border-[var(--color-border)]">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <FileText className="w-3.5 h-3.5 text-indigo-400" />

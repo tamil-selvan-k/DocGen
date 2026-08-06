@@ -82,7 +82,7 @@ export default function Jobs() {
               className={`px-3.5 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                 status === opt.value
                   ? 'bg-indigo-600/20 text-indigo-300 border-indigo-600/40'
-                  : 'bg-transparent text-slate-400 border-[#1e2640] hover:border-slate-600'
+                  : 'bg-transparent text-slate-400 border-[var(--color-border)] hover:border-slate-600'
               }`}
             >
               {opt.label}
@@ -102,7 +102,7 @@ export default function Jobs() {
           {[...Array(5)].map((_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : isError ? (
-        <div className="flex flex-col items-center justify-center py-12 text-slate-400 border border-dashed border-[#1e2640] rounded-xl gap-2">
+        <div className="flex flex-col items-center justify-center py-12 text-slate-400 border border-dashed border-[var(--color-border)] rounded-xl gap-2">
           <AlertTriangle className="w-8 h-8 text-rose-400" />
           <p className="text-sm">Failed to load execution history.</p>
           <Button variant="secondary" size="sm" onClick={() => window.location.reload()}>
@@ -125,7 +125,7 @@ export default function Jobs() {
             <Card
               key={job.id}
               onClick={() => handleRowClick(job.id)}
-              className="hover:border-indigo-600/30 transition-all duration-200 cursor-pointer p-4 bg-[#111520] hover:shadow-md hover:shadow-indigo-950/10 flex flex-col gap-3 group"
+              className="hover:border-indigo-600/30 transition-all duration-200 cursor-pointer p-4 bg-[var(--color-surface)] hover:shadow-md hover:shadow-indigo-950/10 flex flex-col gap-3 group"
             >
               {/* Top Row: Status, Repo Info, PR Link */}
               <div className="flex items-center justify-between gap-4 flex-wrap md:flex-nowrap">
@@ -140,7 +140,7 @@ export default function Jobs() {
                     </p>
                     {/* Commit metadata line */}
                     <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-500">
-                      <span className="font-mono bg-[#161b2e] px-1.5 py-0.5 rounded border border-[#1e2640] text-slate-400">
+                      <span className="font-mono bg-[var(--color-surface-2)] px-1.5 py-0.5 rounded border border-[var(--color-border)] text-slate-400">
                         {shortSha(job.commitSha)}
                       </span>
                       <span>•</span>
@@ -188,7 +188,7 @@ export default function Jobs() {
 
           {/* Pagination Toolbar */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between pt-4 border-t border-[#1e2640]">
+             <div className="flex items-center justify-between pt-4 border-t border-[var(--color-border)]">
               <p className="text-xs text-slate-500">
                 Page <span className="text-slate-300 font-medium">{page}</span> of <span className="text-slate-300 font-medium">{totalPages}</span> · {meta?.total} executions
               </p>
