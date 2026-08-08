@@ -1,4 +1,4 @@
-export type JobStatus = 'QUEUED' | 'PROCESSING' | 'SUCCEEDED' | 'FAILED';
+export type JobStatus = 'QUEUED' | 'PROCESSING' | 'SUCCEEDED' | 'FAILED' | 'SKIPPED';
 
 export interface JobRepository {
   fullName: string;

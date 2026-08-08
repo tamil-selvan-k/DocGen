@@ -16,7 +16,7 @@ export default function Landing() {
       <nav className="flex items-center justify-between px-8 py-5 border-b border-[var(--color-border)]">
         <div className="flex items-center gap-2">
           <img src="/logo.webp" alt="Logo" className="w-8 h-8 rounded-lg object-cover flex-shrink-0" />
-          <span className="font-semibold text-slate-100">DocGen AI</span>
+          <span className="font-semibold text-slate-100">DocGen</span>
         </div>
         <div className="flex items-center gap-3">
           <Link to="/login" className="btn-ghost">Sign in</Link>
@@ -38,7 +38,7 @@ export default function Landing() {
           </h1>
 
           <p className="text-lg text-slate-400 max-w-lg mx-auto mb-8 leading-relaxed">
-            DocGen AI watches your GitHub repos. Every commit triggers AI documentation generation and opens a Pull Request — zero manual work.
+            DocGen watches your GitHub repos. Every commit triggers AI documentation generation and opens a Pull Request — zero manual work.
           </p>
 
           <div className="flex items-center justify-center gap-3 flex-wrap">
@@ -69,7 +69,7 @@ export default function Landing() {
       </main>
 
       <footer className="text-center py-6 text-xs text-slate-600 border-t border-[var(--color-border)]">
-        © {new Date().getFullYear()} DocGen AI. All rights reserved.
+        © {new Date().getFullYear()} DocGen. All rights reserved.
       </footer>
     </div>
   );

@@ -33,14 +33,14 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0a0d14] px-4">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--color-bg)] px-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}
         className="w-full max-w-sm"
       >
         <div className="flex items-center justify-center gap-2 mb-8">
           <img src="/logo.webp" alt="Logo" className="w-9 h-9 rounded-lg object-cover flex-shrink-0" />
-          <span className="text-xl font-semibold text-slate-100">DocGen AI</span>
+          <span className="text-xl font-semibold text-slate-100">DocGen</span>
         </div>
 
         <div className="card p-7">

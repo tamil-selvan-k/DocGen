@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { LayoutDashboard, GitBranch, Clock, CheckCircle, XCircle, Loader2, ExternalLink, AlertTriangle } from 'lucide-react';
+import { LayoutDashboard, GitBranch, Clock, CheckCircle, XCircle, Loader2, ExternalLink, AlertTriangle, MinusCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { jobsApi } from '@/api/jobs.api';
 import { repositoriesApi } from '@/api/repositories.api';
@@ -47,6 +47,7 @@ export default function Dashboard() {
     processing: recentJobs?.filter(j => j.status === 'PROCESSING').length ?? 0,
     succeeded: recentJobs?.filter(j => j.status === 'SUCCEEDED').length ?? 0,
     failed: recentJobs?.filter(j => j.status === 'FAILED').length ?? 0,
+    skipped: recentJobs?.filter(j => j.status === 'SKIPPED').length ?? 0,
   };
 
   return (
@@ -61,12 +62,13 @@ export default function Dashboard() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <StatCard icon={GitBranch} label="Repositories" value={counts.repos} color="bg-indigo-500/15 text-indigo-400" />
         <StatCard icon={Clock} label="Queued" value={counts.queued} color="bg-amber-500/15 text-amber-400" />
         <StatCard icon={Loader2} label="Processing" value={counts.processing} color="bg-blue-500/15 text-blue-400" />
         <StatCard icon={CheckCircle} label="Succeeded" value={counts.succeeded} color="bg-green-500/15 text-green-400" />
         <StatCard icon={XCircle} label="Failed" value={counts.failed} color="bg-red-500/15 text-red-400" />
+        <StatCard icon={MinusCircle} label="Skipped" value={counts.skipped} color="bg-slate-500/15 text-slate-400" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

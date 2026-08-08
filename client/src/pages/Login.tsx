@@ -33,19 +33,19 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0a0d14] px-4">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--color-bg)] px-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}
         className="w-full max-w-sm"
       >
         <div className="flex items-center justify-center gap-2 mb-8">
           <img src="/logo.webp" alt="Logo" className="w-9 h-9 rounded-lg object-cover flex-shrink-0" />
-          <span className="text-xl font-semibold text-slate-100">DocGen AI</span>
+          <span className="text-xl font-semibold text-slate-100">DocGen</span>
         </div>
 
         <div className="card p-7">
           <h1 className="text-lg font-semibold text-slate-100 mb-1">Sign in</h1>
-          <p className="text-sm text-slate-500 mb-6">Welcome back to DocGen AI</p>
+          <p className="text-sm text-slate-500 mb-6">Welcome back to DocGen</p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <Input

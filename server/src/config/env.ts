@@ -18,9 +18,9 @@ const envSchema = z.object({
   GITHUB_APP_ID: z.string().min(1, "GITHUB_APP_ID is required"),
   GITHUB_PRIVATE_KEY: z.string().min(1, "GITHUB_PRIVATE_KEY (Base64-encoded PEM) is required"),
   GITHUB_WEBHOOK_SECRET: z.string().min(1, "GITHUB_WEBHOOK_SECRET is required"),
-  GITHUB_APP_NAME: z.string().default('docgen-ai'),
+  GITHUB_APP_NAME: z.string().default('docgen'),
   GEMINI_API_KEY: z.string().min(1, "GEMINI_API_KEY is required"),
-  GEMINI_MODEL: z.string().default('gemini-3.5-flash'),
+  GEMINI_MODEL: z.string().default('gemini-1.5-flash'),
 
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: z.coerce.number().optional(),

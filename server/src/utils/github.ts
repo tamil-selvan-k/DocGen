@@ -44,7 +44,7 @@ export class GitHubClient {
         'Authorization': `Bearer ${appJwt}`,
         'Accept': 'application/vnd.github+json',
         'X-GitHub-Api-Version': '2022-11-28',
-        'User-Agent': 'DocGen-AI',
+        'User-Agent': 'DocGen',
       },
     });
 
@@ -80,7 +80,7 @@ export class GitHubClient {
           'Authorization': `Bearer ${appJwt}`,
           'Accept': 'application/vnd.github+json',
           'X-GitHub-Api-Version': '2022-11-28',
-          'User-Agent': 'DocGen-AI',
+          'User-Agent': 'DocGen',
         },
       });
 
@@ -140,7 +140,7 @@ export class GitHubClient {
     headers.set('Authorization', `Bearer ${token}`);
     if (!headers.has('Accept')) headers.set('Accept', 'application/vnd.github+json');
     headers.set('X-GitHub-Api-Version', '2022-11-28');
-    headers.set('User-Agent', 'DocGen-AI');
+    headers.set('User-Agent', 'DocGen');
 
     let body: BodyInit | undefined;
     if (options.body !== null && options.body !== undefined) {

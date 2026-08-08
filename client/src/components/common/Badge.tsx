@@ -12,6 +12,7 @@ const variantStyles: Record<string, string> = {
   FAILED:     'bg-red-500/15 text-red-400 border-red-500/20',
   info:       'bg-blue-500/15 text-blue-400 border-blue-500/20',
   PROCESSING: 'bg-blue-500/15 text-blue-400 border-blue-500/20',
+  SKIPPED:    'bg-slate-500/15 text-slate-400 border-slate-500/20',
   default:    'bg-slate-500/15 text-slate-400 border-slate-500/20',
 };
 

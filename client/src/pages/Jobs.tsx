@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Briefcase, ChevronLeft, ChevronRight, AlertTriangle, CheckCircle2, AlertCircle, Loader2, Clock, GitPullRequest, ChevronRight as ChevronRightIcon, ArrowLeft } from 'lucide-react';
+import { Briefcase, ChevronLeft, ChevronRight, AlertTriangle, CheckCircle2, AlertCircle, Loader2, Clock, GitPullRequest, ChevronRight as ChevronRightIcon, ArrowLeft, MinusCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { jobsApi } from '@/api/jobs.api';
 import { Card } from '@/components/common/Card';
@@ -17,6 +17,7 @@ const STATUS_OPTIONS: Array<{ value: JobStatus | ''; label: string }> = [
   { value: 'PROCESSING', label: 'Processing' },
   { value: 'SUCCEEDED', label: 'Succeeded' },
   { value: 'FAILED', label: 'Failed' },
+  { value: 'SKIPPED', label: 'Skipped' },
 ];
 
 function JobStatusIcon({ status }: { status: JobStatus }) {
@@ -27,6 +28,8 @@ function JobStatusIcon({ status }: { status: JobStatus }) {
       return <AlertCircle className="w-5 h-5 text-rose-400 flex-shrink-0" />;
     case 'PROCESSING':
       return <Loader2 className="w-5 h-5 text-indigo-400 animate-spin flex-shrink-0" />;
+    case 'SKIPPED':
+      return <MinusCircle className="w-5 h-5 text-slate-400 flex-shrink-0" />;
     case 'QUEUED':
     default:
       return <Clock className="w-5 h-5 text-slate-500 flex-shrink-0" />;

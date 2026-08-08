@@ -39,7 +39,7 @@ export function AppLayout() {
           >
             <Menu className="w-6 h-6" />
           </button>
-          <span className="font-semibold text-slate-100">DocGen AI</span>
+          <span className="font-semibold text-slate-100">DocGen</span>
         </div>
       </header>
 

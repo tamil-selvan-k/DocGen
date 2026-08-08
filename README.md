@@ -1,11 +1,11 @@
-# DocGen AI
+# DocGen
 
-Automated documentation management powered by Google Gemini. When code is pushed to a GitHub repository with the GitHub App installed, DocGen AI fetches the commit diff, generates updated documentation, validates it against the actual code to prevent hallucinations, and opens a pull request — all automatically.
+Automated documentation management powered by Google Gemini. When code is pushed to a GitHub repository with the GitHub App installed, DocGen fetches the commit diff, generates updated documentation, validates it against the actual code to prevent hallucinations, and opens a pull request — all automatically.
 
 ## How it works
 
 1. Developer pushes code to a GitHub repository
-2. GitHub App sends a webhook to DocGen AI
+2. GitHub App sends a webhook to DocGen
 3. A BullMQ worker fetches the diff, calls Gemini to generate docs, then validates the output
 4. If validation passes, a branch is created and a PR is opened with the updated `README.md` or `docs/API.md`
 5. The developer reviews and merges the PR
@@ -70,8 +70,8 @@ Required variables:
 - `GEMINI_API_KEY` — Google Gemini API key
 
 Optional variables:
-- `GEMINI_MODEL` — The Gemini model used for generation (defaults to `gemini-3.5-flash`)
-- `GITHUB_APP_NAME` — The name of the GitHub App (defaults to `docgen-ai`)
+- `GEMINI_MODEL` — The Gemini model used for generation (defaults to `gemini-1.5-flash`)
+- `GITHUB_APP_NAME` — The name of the GitHub App (defaults to `docgen`)
 
 ### 3. Set up the database
 

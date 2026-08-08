@@ -18,7 +18,7 @@ async function bootstrap() {
 
     // 3. Start the HTTP server
     server = app.listen(config.PORT, () => {
-      logger.info(`✅ DocGen AI server running on port ${config.PORT} [${config.NODE_ENV}]`);
+      logger.info(`✅ DocGen server running on port ${config.PORT} [${config.NODE_ENV}]`);
       logger.info(`📖 API available at http://localhost:${config.PORT}/api/v1`);
       logger.info(`🔍 Health check at http://localhost:${config.PORT}/api/v1/health`);
     });

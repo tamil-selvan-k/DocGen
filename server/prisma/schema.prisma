@@ -67,6 +67,7 @@ enum JobStatus {
   PROCESSING
   SUCCEEDED
   FAILED
+  SKIPPED
 }
 
 model DocumentationJob {

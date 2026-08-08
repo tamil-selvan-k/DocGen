@@ -44,9 +44,9 @@ export function Sidebar({ isMobileOpen, onMobileClose, isCollapsed, onLogoutClic
             <img src="/logo.webp" alt="Logo" className="w-8 h-8 rounded-lg object-cover flex-shrink-0" />
             {/* Show label if sidebar is not collapsed OR if in mobile drawer */}
             {(!isCollapsed || isMobileOpen) ? (
-              <span className="font-semibold text-slate-100 truncate">DocGen AI</span>
+              <span className="font-semibold text-slate-100 truncate">DocGen</span>
             ) : (
-              <span className="font-semibold text-slate-100 truncate md:hidden">DocGen AI</span>
+              <span className="font-semibold text-slate-100 truncate md:hidden">DocGen</span>
             )}
           </div>
         </div>

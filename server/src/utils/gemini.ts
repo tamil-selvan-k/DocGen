@@ -13,8 +13,13 @@ export class GeminiClient {
   public static async generateDocumentation(
     diff: string,
     fileContexts: { path: string; content: string }[]
-  ): Promise<string> {
-    const model = this.genAI.getGenerativeModel({ model: config.GEMINI_MODEL });
+  ): Promise<{ updateNeeded: boolean; updatedMarkdown: string; reason: string }> {
+    const model = this.genAI.getGenerativeModel({
+      model: config.GEMINI_MODEL,
+      generationConfig: {
+        responseMimeType: 'application/json',
+      },
+    });
 
     // Format context files for prompt consumption
     const contextString = fileContexts
@@ -22,13 +27,13 @@ export class GeminiClient {
       .join('\n\n---\n\n');
 
     const prompt = `
-You are a senior technical writer. Your task is to update or generate markdown documentation based ONLY on the provided code diffs and current file contents.
+You are a senior technical writer. Your task is to analyze the provided code diffs and decide if any updates are needed for the documentation files. If so, generate the updated markdown content.
 
 ### CRITICAL RULES:
 1. Do NOT hallucinate any repository facts, parameters, configurations, or behavior.
 2. Only write facts and details that are explicitly present or directly derivable from the code diff and context files.
 3. If the code does not support a feature, do not mention it.
-4. Output must be clean, professional Markdown.
+4. Output markdown must be clean and professional.
 
 ### Code Diff:
 \`\`\`diff
@@ -38,19 +43,39 @@ ${diff}
 ### Current File Contexts:
 ${contextString}
 
-Generate the updated documentation in markdown. Provide only the markdown content, no extra chat or wrapping except if the markdown requires code fences inside. Do not wrap the whole response in a markdown code block.
+Determine if this code change requires updating the documentation.
+Respond with a JSON object following this exact schema:
+{
+  "updateNeeded": boolean, // Set to true if the code diff contains changes that should be documented (e.g. new features, public API changes, changed config keys). Set to false if the changes are internal (e.g. refactoring, internal tests, styling, comments) and DO NOT warrant any documentation changes.
+  "updatedMarkdown": string, // The complete, updated markdown documentation file contents. If updateNeeded is false, set this to an empty string.
+  "reason": string // A brief explanation of why an update was or was not needed.
+}
+Return ONLY a valid JSON object.
 `;
 
+    let text = '';
     try {
       const result = await model.generateContent(prompt);
-      const text = result.response.text();
+      text = result.response.text();
       if (!text) {
         throw new Error('Empty response from Gemini API');
       }
-      return text.trim();
+
+      const cleanJson = text.replace(/^```json\s*/i, '').replace(/\s*```$/, '').trim();
+      const parsed = JSON.parse(cleanJson) as { updateNeeded: boolean; updatedMarkdown: string; reason: string };
+
+      return {
+        updateNeeded: typeof parsed.updateNeeded === 'boolean' ? parsed.updateNeeded : true,
+        updatedMarkdown: parsed.updatedMarkdown || '',
+        reason: parsed.reason || 'Completed analysis',
+      };
     } catch (error) {
-      logger.error('Error calling Gemini API for doc generation', error);
-      throw new ApiError('Failed to generate documentation via Gemini', 500);
+      logger.warn('Failed to parse Gemini response as JSON, falling back to assuming update is needed', error);
+      return {
+        updateNeeded: true,
+        updatedMarkdown: text ? text.trim() : '',
+        reason: 'Failed to parse JSON response',
+      };
     }
   }
 

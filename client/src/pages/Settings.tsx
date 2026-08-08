@@ -245,7 +245,7 @@ export default function SettingsPage() {
                     </div>
                     <div className="pt-4 border-t border-[var(--color-border)] flex flex-col gap-2 items-start">
                       <p className="text-xs text-slate-500 leading-relaxed">
-                        To synchronize repository updates and deploy automatic docs generation workflows, configure the DocGen AI App on your target repositories.
+                        To synchronize repository updates and deploy automatic docs generation workflows, configure the DocGen App on your target repositories.
                       </p>
                       <a href={githubInstallUrl} className="btn-secondary inline-flex items-center gap-2 mt-2">
                         <Github className="w-4 h-4" />

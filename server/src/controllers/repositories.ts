@@ -80,7 +80,7 @@ export const listRepositories = asyncHandler(async (req: Request, res: Response)
     headers: {
       Authorization: `Bearer ${token}`,
       Accept: 'application/vnd.github+json',
-      'User-Agent': 'DocGen-AI',
+      'User-Agent': 'DocGen',
     },
   });
 
@@ -142,7 +142,7 @@ export const getRepository = asyncHandler(async (req: Request, res: Response) =>
     headers: {
       Authorization: `Bearer ${token}`,
       Accept: 'application/vnd.github+json',
-      'User-Agent': 'DocGen-AI',
+      'User-Agent': 'DocGen',
     },
   });
 
@@ -192,7 +192,7 @@ export const syncRepository = asyncHandler(async (req: Request, res: Response) =
       headers: {
         Authorization: `Bearer ${githubToken}`,
         Accept: 'application/vnd.github+json',
-        'User-Agent': 'DocGen-AI',
+        'User-Agent': 'DocGen',
       },
     });
 
@@ -273,7 +273,7 @@ export const syncRepository = asyncHandler(async (req: Request, res: Response) =
     headers: {
       Authorization: `Bearer ${githubToken}`,
       Accept: 'application/vnd.github+json',
-      'User-Agent': 'DocGen-AI',
+      'User-Agent': 'DocGen',
     },
   });
   if (!repoInfoRes.ok) throw new ApiError('Failed to fetch repository info from GitHub', 502);
@@ -289,7 +289,7 @@ export const syncRepository = asyncHandler(async (req: Request, res: Response) =
         headers: {
           Authorization: `Bearer ${githubToken}`,
           Accept: 'application/vnd.github+json',
-          'User-Agent': 'DocGen-AI',
+          'User-Agent': 'DocGen',
         },
       }
     );
