@@ -70,7 +70,7 @@ Required variables:
 - `GEMINI_API_KEY` — Google Gemini API key
 
 Optional variables:
-- `GEMINI_MODEL` — The Gemini model used for generation (defaults to `gemini-1.5-flash`)
+- `GEMINI_MODEL` — The Gemini model used for generation (defaults to `gemini-3.5-flash`)
 - `GITHUB_APP_NAME` — The name of the GitHub App (defaults to `docgen`)
 
 ### 3. Set up the database
