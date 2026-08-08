@@ -50,6 +50,18 @@ export const receiveWebhook = asyncHandler(async (req: Request, res: Response) =
     return res.status(200).json({ success: true, data: null, error: null, meta: { message: 'Branch deletion event skipped' } });
   }
 
+  // Skip bot-initiated pushes to prevent feedback loops
+  if (payload.sender?.type === 'Bot' || payload.sender?.login?.includes('[bot]')) {
+    logger.info(`Webhook push skipped: sender is a bot (${payload.sender?.login ?? 'unknown'})`);
+    return res.status(200).json({ success: true, data: null, error: null, meta: { message: 'Bot push skipped' } });
+  }
+
+  // Skip pushes to docgen/* branches to prevent loops from our own PRs
+  if ((payload.ref as string).startsWith('refs/heads/docgen/')) {
+    logger.info(`Webhook push skipped: docgen branch (${payload.ref})`);
+    return res.status(200).json({ success: true, data: null, error: null, meta: { message: 'DocGen branch push skipped' } });
+  }
+
   const repo = payload.repository;
   const commitSha: string = payload.after;
   const eventId: string = deliveryId || `${repo.id}-${commitSha}`;
@@ -111,6 +123,7 @@ export const receiveWebhook = asyncHandler(async (req: Request, res: Response) =
     jobId: job.id,
     repositoryId,
     commitSha,
+    beforeSha: payload.before !== zeroSha ? payload.before : undefined,
     installationId,
     owner: repo.owner.login,
     repo: repo.name,

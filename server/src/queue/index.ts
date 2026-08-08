@@ -6,6 +6,7 @@ export interface DocJobData {
   jobId: string;
   repositoryId: string;
   commitSha: string;
+  beforeSha?: string;
   installationId: string;
   owner: string;
   repo: string;

@@ -79,7 +79,7 @@ function selectDocFile(changedFiles: string[]): string {
  * → validate → create branch → commit → open PR → record results.
  */
 async function processDocJob(job: Job<DocJobData>): Promise<void> {
-  const { jobId, repositoryId, commitSha, installationId, owner, repo, defaultBranch } = job.data;
+  const { jobId, repositoryId, commitSha, beforeSha, installationId, owner, repo, defaultBranch } = job.data;
 
   logger.info(`Worker processing job ${jobId}: ${owner}/${repo}@${commitSha.slice(0, 7)}`);
 
@@ -97,10 +97,27 @@ async function processDocJob(job: Job<DocJobData>): Promise<void> {
       files?: { filename: string; patch?: string; status: string }[];
     }
 
-    const commitDetail = await GitHubClient.apiRequest<CommitDetail>(
-      `/repos/${owner}/${repo}/commits/${commitSha}`,
-      await GitHubClient.getInstallationToken(installationId)
-    );
+    const token = await GitHubClient.getInstallationToken(installationId);
+    let commitDetail: CommitDetail;
+
+    if (beforeSha) {
+      // Use Compare API to get cumulative diff for all commits in this push
+      logger.info(`[${jobId}] Using Compare API: ${beforeSha.slice(0, 7)}...${commitSha.slice(0, 7)}`);
+      commitDetail = await GitHubClient.apiRequest<CommitDetail>(
+        `/repos/${owner}/${repo}/compare/${beforeSha}...${commitSha}`,
+        token
+      );
+      if (commitDetail.files?.length === 300) {
+        logger.warn(`[${jobId}] Compare API returned 300 files — response may be truncated`);
+      }
+    } else {
+      // Fallback: single-commit diff (new branch or no beforeSha)
+      logger.info(`[${jobId}] Using single-commit diff for ${commitSha.slice(0, 7)}`);
+      commitDetail = await GitHubClient.apiRequest<CommitDetail>(
+        `/repos/${owner}/${repo}/commits/${commitSha}`,
+        token
+      );
+    }
 
     // Build a unified diff string from file patches
     const diff = (commitDetail.files || [])
@@ -127,7 +144,6 @@ async function processDocJob(job: Job<DocJobData>): Promise<void> {
     logger.info(`[${jobId}] Extracted ${extractedFacts.length} facts from diff`);
 
     // ── STEP 4: Fetch existing documentation file content ────────────────
-    const token = await GitHubClient.getInstallationToken(installationId);
     let existingDocContent = '';
     let existingDocSha: string | undefined;
 
