@@ -58,6 +58,24 @@ function extractFactsFromDiff(diff: string): string[] {
     }
   }
 
+  // Fallback: when the diff has no declaration-level facts (e.g. config/JSON changes)
+  // OR only removal facts (no positive evidence of what now exists), include added lines
+  // verbatim so the validator has concrete evidence. Cap at 40 lines to prevent prompt overflow.
+  const hasPositiveFacts = facts.some(f => f.startsWith('Added:'));
+  if (!hasPositiveFacts) {
+    let fallbackCount = 0;
+    for (const line of lines) {
+      if (fallbackCount >= 40) break;
+      if (line.startsWith('+') && !line.startsWith('+++')) {
+        const content = line.slice(1).trim();
+        if (content.length > 2) {
+          facts.push(`Changed line: ${content.slice(0, 120)}`);
+          fallbackCount++;
+        }
+      }
+    }
+  }
+
   return facts;
 }
 
@@ -182,7 +200,7 @@ async function processDocJob(job: Job<DocJobData>): Promise<void> {
     logger.info(`[${jobId}] Validating generated documentation...`);
 
     const validation = await GeminiClient.validateDocumentation(
-      generatedDocs, diff, extractedFacts
+      generatedDocs, existingDocContent, diff, extractedFacts
     );
 
     if (!validation.isValid) {
