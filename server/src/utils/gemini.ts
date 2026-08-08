@@ -97,7 +97,10 @@ Return ONLY a valid JSON object.
     diff: string,
     extractedFacts: string[]
   ): Promise<{ isValid: boolean; reason?: string }> {
-    const model = this.genAI.getGenerativeModel({ model: config.GEMINI_MODEL });
+    const model = this.genAI.getGenerativeModel({
+      model: config.GEMINI_MODEL,
+      generationConfig: { responseMimeType: 'application/json' },
+    });
 
     const safeExisting  = truncate(existingDocs,   MAX_EXISTING_DOCS_CHARS,   'existingDocs');
     const safeGenerated = truncate(generatedDocs,   MAX_GENERATED_DOCS_CHARS,  'generatedDocs');
